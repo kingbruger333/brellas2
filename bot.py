@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import timezone, timedelta
 from html import escape
@@ -438,8 +439,16 @@ def build_app() -> Application:
     return app
 
 
+async def main() -> None:
+    app = build_app()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
+    await asyncio.Event().wait()
+
+
 if __name__ == "__main__":
     if BOT_TOKEN == "PASTE_TOKEN":
         raise RuntimeError("Укажите BOT_TOKEN в верхней части bot.py")
 
-    build_app().run_polling(allowed_updates=Update.ALL_TYPES)
+    asyncio.run(main())
