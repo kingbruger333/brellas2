@@ -1,0 +1,9 @@
+
+> b2b-wholesale-catalog@0.1.0 start
+> next start -p 3101
+
+   ▲ Next.js 15.5.15
+   - Local:        http://localhost:3101
+   - Network:      http://26.203.93.176:3101
+
+ ✓ Starting...

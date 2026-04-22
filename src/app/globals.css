@@ -1,0 +1,885 @@
+:root {
+  --bg: #e9e7e2;
+  --bg-deep: #e2dfd8;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --surface-dark: #1c1916;
+  --text: #171717;
+  --muted: #737373;
+  --brand: #8a5a32;
+  --brand-deep: #6f4626;
+  --accent: #c9a06c;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.1);
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-card: 0 10px 24px rgba(0, 0, 0, 0.08);
+  --radius-2xl: 36px;
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --container: 1200px;
+}
+
+* { box-sizing: border-box; }
+html,
+.siteRoot {
+  scroll-behavior: smooth;
+}
+
+body,
+.siteBody {
+  margin: 0;
+  min-height: 100vh;
+  min-width: 320px;
+  color: var(--text);
+  background: #e9e7e2 !important;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+main {
+  display: block;
+}
+
+.container {
+  width: min(calc(100% - 40px), var(--container));
+  margin: 0 auto;
+}
+
+.siteHeader {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 0;
+  color: #000000;
+  background: transparent !important;
+  box-shadow: none;
+  backdrop-filter: blur(20px);
+}
+
+.siteHeaderInner,
+.siteFooterInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 18px 0;
+}
+
+.brand {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.siteNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  color: #000000;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.siteNav a {
+  display: inline-flex;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #000000;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.siteNav a:hover {
+  color: #000000;
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.siteNav a[aria-current="page"] {
+  font-weight: 600;
+  opacity: 1;
+}
+
+.hero {
+  padding: 80px 0 60px;
+}
+
+.heroCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 32px;
+  margin-top: 40px;
+  padding: 52px 44px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: all 0.25s ease;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.heroContent h1,
+.sectionTitle h2,
+.catalogHeader h1,
+.productPageTitle,
+.ctaBanner h2 {
+  margin: 0;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+
+.heroContent h1 {
+  max-width: 11ch;
+  font-size: clamp(3.2rem, 8vw, 5.8rem);
+}
+
+.heroContent p,
+.sectionTitle p,
+.catalogHeader p,
+.productDescription,
+.richText p,
+.featureCard p,
+.audienceCard p,
+.highlightCard p,
+.conditionCard p,
+.ctaBanner p,
+.siteFooter p {
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.heroContent p {
+  max-width: 48rem;
+  margin: 22px 0 0;
+  font-size: 1.08rem;
+}
+
+.heroActions,
+.productCardActions,
+.catalogToolbar,
+.detailMeta,
+.ctaBannerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.heroActions { margin-top: 30px; }
+
+.heroAside,
+.featureGrid,
+.audienceGrid,
+.productGrid,
+.conditionsGrid,
+.thumbGrid {
+  display: grid;
+  gap: 22px;
+}
+
+.heroAside { grid-template-columns: 1fr; }
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 14px;
+  color: var(--brand);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.highlightCard,
+.featureCard,
+.audienceCard,
+.conditionCard,
+.ctaBanner,
+.catalogHeader,
+.productCard,
+.productDetailPanel {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(16px);
+  transition: all 0.25s ease;
+}
+
+.heroCard:hover,
+.highlightCard:hover,
+.featureCard:hover,
+.audienceCard:hover,
+.conditionCard:hover,
+.ctaBanner:hover,
+.catalogHeader:hover,
+.productDetailPanel:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
+}
+
+.highlightCard,
+.featureCard,
+.audienceCard,
+.conditionCard,
+.catalogHeader,
+.productDetailPanel {
+  padding: 24px;
+}
+
+.highlightCard,
+.featureCard,
+.audienceCard,
+.conditionCard {
+  padding: 28px;
+}
+
+.highlightCard strong,
+.featureCard strong,
+.audienceCard strong,
+.conditionCard strong,
+.ctaBanner h2,
+.footerBrand {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.highlightCard strong,
+.featureCard strong,
+.audienceCard strong,
+.conditionCard strong {
+  font-size: 1.16rem;
+  font-weight: 700;
+}
+
+.primaryButton,
+.secondaryButton,
+.telegramButton,
+.secondaryButtonFilled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.96rem;
+  font-weight: 700;
+  transition: all 0.25s ease;
+}
+
+.primaryButton,
+.telegramButton {
+  color: #fff;
+  background: #000;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+}
+
+.secondaryButton {
+  color: var(--text);
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.secondaryButtonFilled {
+  color: #fff;
+  border-color: #000;
+  background: #000;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+}
+
+.primaryButton:hover,
+.telegramButton:hover,
+.secondaryButtonFilled:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.secondaryButton:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.primaryButton:active,
+.secondaryButton:active,
+.telegramButton:active,
+.secondaryButtonFilled:active {
+  transform: scale(0.98);
+}
+
+.section {
+  padding: 96px 0;
+  margin-top: 60px;
+  border-top: 1px solid var(--line);
+}
+
+.sectionTitle {
+  margin-bottom: 28px;
+  max-width: 760px;
+}
+
+.sectionTitle h2,
+.catalogHeader h1,
+.productPageTitle,
+.ctaBanner h2 {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+}
+
+.featureGrid,
+.audienceGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.productGrid {
+  align-items: stretch;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.conditionsGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+.showcaseBlock {
+  display: grid;
+  gap: 24px;
+}
+
+.showcaseScroller {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 320px);
+  gap: 22px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 4px 4px 18px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.showcaseScroller > * {
+  scroll-snap-align: start;
+}
+
+.showcaseButton {
+  justify-self: start;
+}
+
+.productGrid > *,
+.featureGrid > *,
+.audienceGrid > *,
+.conditionsGrid > *,
+.heroAside > * {
+  animation: cardFadeIn 0.42s ease-out both;
+}
+
+.productGrid > *:nth-child(2),
+.featureGrid > *:nth-child(2),
+.audienceGrid > *:nth-child(2),
+.conditionsGrid > *:nth-child(2),
+.heroAside > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+
+.productGrid > *:nth-child(3),
+.featureGrid > *:nth-child(3),
+.audienceGrid > *:nth-child(3),
+.conditionsGrid > *:nth-child(3),
+.heroAside > *:nth-child(3) {
+  animation-delay: 0.08s;
+}
+
+.productGrid > *:nth-child(4),
+.conditionsGrid > *:nth-child(4) {
+  animation-delay: 0.12s;
+}
+
+.productGrid > *:nth-child(n + 5) {
+  animation-delay: 0.16s;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.catalogShell {
+  display: grid;
+  gap: 24px;
+}
+
+.catalogHeader { margin: 44px auto 0; }
+
+.catalogControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 16px;
+  align-items: end;
+}
+
+.catalogLabel {
+  display: block;
+  margin-bottom: 10px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.catalogInput,
+.catalogSelect {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.96rem;
+}
+
+.categoryScroller {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+}
+
+.categoryChip {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: #f5f5f5;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.92rem;
+  color: var(--muted);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.categoryChip span { color: inherit; }
+
+.categoryChip:hover {
+  background: #e5e5e5;
+  color: var(--text);
+}
+
+.categoryChipActive {
+  color: #fff;
+  background: #000;
+}
+
+.categoryChipActive:hover {
+  color: #fff;
+  background: #000;
+}
+
+.filterChip,
+.productMeta span,
+.detailMeta span,
+.priceBlock,
+.minOrderBlock {
+  border: 1px solid rgba(25, 23, 20, 0.08);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.productCard {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.productCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-card);
+}
+
+.productImageWrap {
+  display: block;
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 1 / 1;
+}
+
+.productBadgeRow {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.stockBadge,
+.categoryBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.stockBadgeAvailable {
+  color: #144d2d;
+  background: rgba(233, 247, 235, 0.94);
+}
+
+.stockBadgeCustom {
+  color: #7a4a1e;
+  background: rgba(251, 238, 220, 0.96);
+}
+
+.categoryBadge {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.3s ease, transform 0.5s ease;
+}
+
+.productCard:hover .productImage { transform: scale(1.05); }
+
+.productCardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.productMeta,
+.detailMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.87rem;
+  color: var(--muted);
+}
+
+.productMeta span,
+.detailMeta span { padding: 9px 12px; }
+
+.productTitle {
+  margin-bottom: 12px;
+  font-size: 1.34rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.productDescription {
+  margin: 0 0 18px;
+  font-size: 0.97rem;
+}
+
+.activeFilters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.92rem;
+}
+
+.resetFiltersButton {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  background: #000;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.resetFiltersButton:hover {
+  opacity: 0.9;
+  transform: scale(1.02);
+}
+
+.resetFiltersButton:active { transform: scale(0.98); }
+
+.productPriceRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: auto;
+  margin-bottom: 18px;
+}
+
+.priceBlock,
+.minOrderBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+}
+
+.priceLabel {
+  color: var(--muted);
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.82rem;
+}
+
+.priceBlock strong,
+.productDetailPrice strong {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.minOrderValue {
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.productCardActions { margin-top: auto; }
+
+.filterChip {
+  min-height: 40px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.productLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.95fr);
+  gap: 30px;
+  padding: 40px 0 84px;
+}
+
+.productGallery { display: grid; gap: 14px; }
+
+.productMainImage,
+.productThumb {
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.productMainImage img,
+.productThumb img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.thumbGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.productDetailPanel {
+  align-self: start;
+  position: sticky;
+  top: 92px;
+}
+
+.detailTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.productLead {
+  margin: 18px 0 0;
+  font-size: 1.04rem;
+}
+
+.productDetailPrice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 24px 0 22px;
+  padding: 18px 20px;
+  border: 1px solid rgba(25, 23, 20, 0.08);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.inlineLink {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.richText { margin-top: 22px; }
+
+.richText ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.ctaBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 32px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(245, 245, 244, 0.98)),
+    linear-gradient(135deg, rgba(23, 23, 23, 0.03), transparent);
+}
+
+.ctaBanner p {
+  max-width: 42rem;
+  margin: 14px 0 0;
+}
+
+.siteFooter {
+  border-top: 1px solid var(--line);
+  color: #ffffff;
+  background: #1a1a1a;
+  padding: 40px 0;
+}
+
+.footerBrand {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.footerInfo { max-width: 460px; }
+
+.footerCopyright {
+  margin-top: 40px;
+  font-size: 13px;
+  opacity: 0.5;
+  text-align: left;
+}
+
+.siteFooter p,
+.siteFooter span {
+  opacity: 0.7;
+}
+
+.siteFooter .footerCopyright {
+  opacity: 0.5;
+}
+
+.emptyState {
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  min-height: 260px;
+  padding: 36px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at top, rgba(201, 160, 108, 0.14), transparent 36%),
+    rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-family: "Segoe UI", Arial, sans-serif;
+  text-align: center;
+}
+
+.emptyState h2 {
+  margin: 0;
+  color: var(--text);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  letter-spacing: -0.03em;
+}
+
+.emptyState p { margin: 0; }
+
+@media (max-width: 1100px) {
+  .heroCard,
+  .productLayout,
+  .conditionsGrid,
+  .featureGrid,
+  .audienceGrid,
+  .catalogControls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .productGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  .ctaBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 900px) {
+  .productGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .siteHeaderInner,
+  .siteFooterInner,
+  .heroCard,
+  .productLayout,
+  .productGrid,
+  .conditionsGrid,
+  .featureGrid,
+  .audienceGrid,
+  .thumbGrid,
+  .productPriceRow,
+  .catalogControls {
+    grid-template-columns: 1fr;
+  }
+
+  .siteHeaderInner,
+  .siteFooterInner {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .siteNav { gap: 14px; }
+  .hero { padding-top: 28px; }
+
+  .heroCard,
+  .catalogHeader,
+  .highlightCard,
+  .featureCard,
+  .audienceCard,
+  .conditionCard,
+  .ctaBanner,
+  .productDetailPanel {
+    padding: 22px;
+  }
+
+  .productDetailPanel { position: static; }
+  .container { width: min(calc(100% - 24px), var(--container)); }
+}
