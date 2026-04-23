@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   title: "Brellas",
   description: "Товары народного потребления оптом для магазинов, маркетплейсов и бизнеса.",
   icons: {
-    icon: "/favicon.ico", // или favicon.png
-  },
+    icon: "/icon.svg"
+  }
 };
 
 export default function RootLayout({

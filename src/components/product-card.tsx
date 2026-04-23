@@ -13,7 +13,7 @@ type ProductCardProps = {
 export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
   const categoryTitle = product.category?.title;
   const imageUrl = product.image?.asset?._ref
-    ? urlFor(product.image).width(900).height(1200).fit("crop").url()
+    ? urlFor(product.image).width(720).height(720).fit("crop").url()
     : "/placeholder-product.jpg";
 
   return (
@@ -28,8 +28,9 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
         <Image
           src={imageUrl}
           alt={product.image?.alt || product.title}
-          width={900}
-          height={1200}
+          width={720}
+          height={720}
+          sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 900px) 50vw, (max-width: 1100px) 33vw, 320px"
           className="productImage"
         />
       </Link>

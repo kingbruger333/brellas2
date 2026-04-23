@@ -1083,8 +1083,87 @@ main {
     justify-content: stretch;
   }
 
-  .siteNav { gap: 14px; }
-  .hero { padding-top: 28px; }
+  .siteHeaderInner,
+  .siteFooterInner {
+    gap: 14px;
+    padding: 12px 0;
+  }
+
+  .siteNav {
+    gap: 10px 12px;
+    font-size: 0.88rem;
+  }
+
+  .siteNav a {
+    font-size: 12px;
+  }
+
+  .brand,
+  .footerBrand {
+    font-size: 1rem;
+    letter-spacing: 0.12em;
+  }
+
+  .hero {
+    padding: 20px 0 24px;
+  }
+
+  .heroContent h1,
+  .sectionTitle h2,
+  .catalogHeader h1,
+  .productPageTitle,
+  .ctaBanner h2,
+  .leadFormIntro h2,
+  .leadChoiceModal h2 {
+    font-size: clamp(1.8rem, 8vw, 2.4rem);
+    line-height: 1.02;
+  }
+
+  .heroContent p,
+  .sectionTitle p,
+  .catalogHeader p,
+  .productDescription,
+  .richText p,
+  .featureCard p,
+  .audienceCard p,
+  .highlightCard p,
+  .conditionCard p,
+  .ctaBanner p,
+  .leadFormIntro p,
+  .leadChoiceModal p,
+  .siteFooter p,
+  .siteFooter span {
+    font-size: 0.94rem;
+    line-height: 1.6;
+  }
+
+  .heroContent p {
+    margin-top: 14px;
+  }
+
+  .heroActions,
+  .productCardActions,
+  .detailMeta,
+  .contactActions,
+  .leadFormFooter,
+  .leadChoiceActions {
+    gap: 10px;
+  }
+
+  .heroActions,
+  .contactActions,
+  .leadChoiceActions {
+    margin-top: 18px;
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .telegramButton,
+  .secondaryButtonFilled {
+    min-height: 44px;
+    padding: 0 18px;
+    font-size: 0.9rem;
+  }
 
   .heroCard,
   .leadFormShell,
@@ -1095,11 +1174,98 @@ main {
   .conditionCard,
   .ctaBanner,
   .productDetailPanel {
-    padding: 22px;
+    padding: 16px;
+  }
+
+  .productCardBody {
+    padding: 16px;
+  }
+
+  .section {
+    padding: 56px 0;
+    margin-top: 32px;
+  }
+
+  .sectionTitle {
+    margin-bottom: 18px;
+  }
+
+  .showcaseBlock,
+  .catalogShell,
+  .productLayout,
+  .featureGrid,
+  .audienceGrid,
+  .productGrid,
+  .conditionsGrid,
+  .thumbGrid,
+  .heroAside {
+    gap: 14px;
+  }
+
+  .catalogHeader {
+    margin-top: 20px;
+  }
+
+  .leadFormShell {
+    gap: 18px;
+    padding: 18px;
+  }
+
+  .leadForm {
+    gap: 12px;
+  }
+
+  .leadField {
+    gap: 6px;
+  }
+
+  .leadField span,
+  .catalogLabel {
+    font-size: 0.82rem;
+  }
+
+  .leadField input,
+  .leadField select,
+  .leadField textarea,
+  .catalogInput,
+  .catalogSelect {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 0.92rem;
+  }
+
+  .leadField textarea {
+    min-height: 88px;
+    padding-top: 12px;
   }
 
   .productDetailPanel { position: static; }
   .leadFieldWide { grid-column: auto; }
-  .leadChoiceModal { padding: 24px; }
+
+  .leadChoiceOverlay {
+    padding: 16px;
+  }
+
+  .leadChoiceModal {
+    padding: 18px;
+  }
+
+  .leadChoiceClose {
+    top: 10px;
+    right: 10px;
+    width: 36px;
+    height: 36px;
+    font-size: 1.3rem;
+  }
+
+  .siteFooter {
+    padding: 28px 0;
+  }
+
+  .footerCopyright {
+    margin-top: 22px;
+    font-size: 12px;
+  }
+
   .container { width: min(calc(100% - 24px), var(--container)); }
 }

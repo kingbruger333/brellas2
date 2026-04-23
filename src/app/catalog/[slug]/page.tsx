@@ -33,7 +33,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   ];
 
   const mainImageUrl = product.image?.asset?._ref
-    ? urlFor(product.image).width(1400).height(1080).fit("crop").url()
+    ? urlFor(product.image).width(1280).height(960).fit("crop").url()
     : "/placeholder-product.jpg";
   const categoryTitle = product.category?.title;
   const categorySlug = product.category?.slug;
@@ -49,8 +49,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <Image
                   src={mainImageUrl}
                   alt={product.image?.alt || product.title}
-                  width={1400}
-                  height={1080}
+                  width={1280}
+                  height={960}
+                  sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 1100px) 50vw, 42vw"
+                  priority
                 />
               </div>
               {gallery.length > 1 ? (
@@ -60,12 +62,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       <Image
                         src={
                           image.asset?._ref
-                            ? urlFor(image).width(480).height(360).fit("crop").url()
+                            ? urlFor(image).width(360).height(360).fit("crop").url()
                             : "/placeholder-product.jpg"
                         }
                         alt={product.title}
-                        width={480}
+                        width={360}
                         height={360}
+                        sizes="(max-width: 760px) 30vw, (max-width: 1100px) 16vw, 180px"
                       />
                     </div>
                   ))}

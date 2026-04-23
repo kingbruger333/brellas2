@@ -1,6 +1,6 @@
 import { groq } from "next-sanity";
 
-const productFields = `
+const productSharedFields = `
   _id,
   title,
   "slug": slug.current,
@@ -8,18 +8,23 @@ const productFields = `
   price,
   minOrder,
   shortDescription,
-  description,
   "category": category->{
     _id,
     title,
     "slug": slug.current
   },
   image,
-  gallery,
-  featured,
   available,
   sortOrder,
   "createdAt": _createdAt
+`;
+
+const productListFields = productSharedFields;
+
+const productDetailFields = `
+  ${productSharedFields},
+  description,
+  gallery
 `;
 
 export const siteSettingsQuery = groq`
@@ -39,8 +44,7 @@ export const categoriesQuery = groq`
     title,
     "slug": slug.current,
     description,
-    sortOrder,
-    "productCount": count(*[_type == "product" && references(^._id)])
+    sortOrder
   }
 `;
 
@@ -50,25 +54,24 @@ export const categoryBySlugQuery = groq`
     title,
     "slug": slug.current,
     description,
-    sortOrder,
-    "productCount": count(*[_type == "product" && references(^._id)])
+    sortOrder
   }
 `;
 
 export const productsQuery = groq`
   *[_type == "product"] | order(sortOrder asc, _createdAt desc){
-    ${productFields}
+    ${productListFields}
   }
 `;
 
 export const featuredProductsQuery = groq`
   *[_type == "product" && featured == true] | order(sortOrder asc, _createdAt desc)[0...6]{
-    ${productFields}
+    ${productListFields}
   }
 `;
 
 export const productBySlugQuery = groq`
   *[_type == "product" && slug.current == $slug][0]{
-    ${productFields}
+    ${productDetailFields}
   }
 `;
