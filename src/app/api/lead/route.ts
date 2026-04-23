@@ -38,7 +38,11 @@ const LEADS_CHAT_ID = process.env.LEADS_CHAT_ID || "-5151727605";
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
 const LEAD_EMAIL_TO = process.env.LEAD_EMAIL_TO || "";
 const LEAD_EMAIL_FROM = process.env.LEAD_EMAIL_FROM || "Brellas <onboarding@resend.dev>";
-const LEAD_STORAGE_DIR = process.env.LEAD_STORAGE_DIR || path.join(process.cwd(), "data");
+const LEAD_STORAGE_DIRS = [
+  process.env.LEAD_STORAGE_DIR,
+  path.join(process.cwd(), "data"),
+  path.join("/tmp", "brellas-leads")
+].filter(Boolean) as string[];
 const SANITY_API_WRITE_TOKEN = process.env.SANITY_API_WRITE_TOKEN || "";
 const PHONE_MIN_DIGITS = 7;
 
@@ -134,12 +138,24 @@ function formatLeadMessage(lead: SavedLead): string {
   ].join("\n");
 }
 
-async function saveLeadToFile(lead: SavedLead): Promise<void> {
-  await mkdir(LEAD_STORAGE_DIR, { recursive: true });
-  await appendFile(path.join(LEAD_STORAGE_DIR, "leads.jsonl"), `${JSON.stringify(lead)}\n`, "utf8");
+async function saveLeadToFile(lead: SavedLead): Promise<string> {
+  let lastError: unknown;
+
+  for (const directory of LEAD_STORAGE_DIRS) {
+    try {
+      await mkdir(directory, { recursive: true });
+      await appendFile(path.join(directory, "leads.jsonl"), `${JSON.stringify(lead)}\n`, "utf8");
+      return directory;
+    } catch (error) {
+      lastError = error;
+      console.error(`File lead save failed in ${directory}`, error);
+    }
+  }
+
+  throw lastError || new Error("No lead storage directory available");
 }
 
-async function saveLead(lead: SavedLead): Promise<"sanity" | "file"> {
+async function saveLead(lead: SavedLead): Promise<"sanity" | "file" | "tmp-file"> {
   if (sanityWriteClient) {
     try {
       await sanityWriteClient.create({
@@ -161,8 +177,8 @@ async function saveLead(lead: SavedLead): Promise<"sanity" | "file"> {
     }
   }
 
-  await saveLeadToFile(lead);
-  return "file";
+  const directory = await saveLeadToFile(lead);
+  return directory.includes(`${path.sep}tmp`) || directory.startsWith("/tmp") ? "tmp-file" : "file";
 }
 
 async function sendTelegram(text: string): Promise<boolean> {
@@ -228,7 +244,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error }, { status: 400 });
   }
 
-  let storage: "sanity" | "file";
+  let storage: "sanity" | "file" | "tmp-file";
 
   try {
     storage = await saveLead(lead);
