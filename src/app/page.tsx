@@ -4,7 +4,6 @@ import { SiteHeader } from "@/components/site-header";
 import { Container } from "@/components/container";
 import { ProductCard } from "@/components/product-card";
 import { SectionTitle } from "@/components/section-title";
-import { TelegramButton } from "@/components/telegram-button";
 import { PortableTextRenderer } from "@/components/portable-text";
 import { LeadForm } from "@/components/lead-form";
 import { getFeaturedProducts, getSiteSettings } from "@/lib/content";
@@ -78,7 +77,9 @@ export default async function HomePage() {
                   <Link href="/catalog" className="primaryButton">
                     Смотреть каталог
                   </Link>
-                  <TelegramButton href={settings?.telegramBotUrl || "#"} label="Связаться" className="secondaryButtonFilled" />
+                  <Link href="/#lead-form" className="secondaryButtonFilled">
+                    Связаться
+                  </Link>
                 </div>
               </div>
               <aside className="heroAside">
