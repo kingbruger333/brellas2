@@ -1,5 +1,5 @@
 :root {
-  --bg: #e9e7e2;
+  --bg: #f5f0e6;
   --bg-deep: #e2dfd8;
   --surface: #ffffff;
   --surface-strong: #ffffff;
@@ -32,7 +32,7 @@ body,
   min-height: 100vh;
   min-width: 320px;
   color: var(--text);
-  background: #e9e7e2 !important;
+  background: var(--bg) !important;
   font-family: Georgia, "Times New Roman", serif;
 }
 
