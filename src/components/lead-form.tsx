@@ -1,6 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { LeadChoiceButton } from "@/components/lead-choice-button";
+
+const LEAD_PREFILL_STORAGE_KEY = "brellas:lead-prefill";
 
 type LeadFormProps = {
   telegramUrl: string;
@@ -35,6 +38,35 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
     setForm((current) => ({ ...current, [name]: value }));
   }
 
+  useEffect(() => {
+    function applyPrefill(rawValue: string | null) {
+      if (!rawValue) return;
+
+      try {
+        const parsed = JSON.parse(rawValue) as { items?: string };
+        if (parsed.items) {
+          setForm((current) => ({ ...current, items: parsed.items || current.items }));
+        }
+      } catch {
+        return;
+      }
+    }
+
+    applyPrefill(window.sessionStorage.getItem(LEAD_PREFILL_STORAGE_KEY));
+
+    function handlePrefill(event: Event) {
+      const detail = (event as CustomEvent<{ items?: string }>).detail;
+      if (detail?.items) {
+        setForm((current) => ({ ...current, items: detail.items || current.items }));
+      }
+
+      document.getElementById("lead-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    window.addEventListener("brellas:lead-prefill", handlePrefill as EventListener);
+    return () => window.removeEventListener("brellas:lead-prefill", handlePrefill as EventListener);
+  }, []);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus("loading");
@@ -66,7 +98,7 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
         <h2>Оставить заявку на оптовую поставку</h2>
         <p>Заполните форму, и менеджер уточнит наличие, объём и условия получения.</p>
         <div className="contactActions">
-          <a href="#lead-form" className="primaryButton">Оставить заявку</a>
+          <LeadChoiceButton telegramUrl={telegramUrl} label="Оставить заявку" className="primaryButton" />
           {telegramUrl !== "#" ? <a href={telegramUrl} className="secondaryButton" target="_blank" rel="noreferrer">Telegram</a> : null}
           <a href="tel:+79772554989" className="secondaryButton">Позвонить</a>
         </div>

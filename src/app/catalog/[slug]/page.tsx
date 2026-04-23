@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { Container } from "@/components/container";
 import { PortableTextRenderer } from "@/components/portable-text";
-import { TelegramButton } from "@/components/telegram-button";
+import { LeadChoiceButton } from "@/components/lead-choice-button";
 import { getProductBySlug, getSiteSettings } from "@/lib/content";
 import { formatPrice } from "@/lib/format";
 import { urlFor } from "@/lib/sanity.image";
@@ -99,10 +99,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <strong>{formatPrice(product.price)}</strong>
               </div>
               <div className="productCardActions">
-                <TelegramButton
-                  href={settings?.telegramBotUrl || "#"}
-                  productName={product.title}
+                <LeadChoiceButton
+                  telegramUrl={settings?.telegramBotUrl || "#"}
                   label="Оставить заявку"
+                  product={{
+                    title: product.title,
+                    sku: product.sku,
+                    category: categoryTitle || undefined
+                  }}
                 />
               </div>
               <div className="richText">

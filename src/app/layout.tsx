@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { LeadChoiceProvider } from "@/components/lead-choice-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="ru" className="siteRoot">
       <body className="siteBody min-h-screen">
-        {children}
+        <LeadChoiceProvider>{children}</LeadChoiceProvider>
       </body>
     </html>
   );

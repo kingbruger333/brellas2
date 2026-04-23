@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { urlFor } from "@/lib/sanity.image";
-import { TelegramButton } from "./telegram-button";
+import { LeadChoiceButton } from "./lead-choice-button";
 
 type ProductCardProps = {
   product: Product;
@@ -56,7 +56,15 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
           <Link href={`/catalog/${product.slug}`} className="secondaryButton">
             Подробнее
           </Link>
-          <TelegramButton href={telegramBotUrl} productName={product.title} label="Оставить заявку" />
+          <LeadChoiceButton
+            telegramUrl={telegramBotUrl}
+            label="Оставить заявку"
+            product={{
+              title: product.title,
+              sku: product.sku,
+              category: categoryTitle || undefined
+            }}
+          />
         </div>
       </div>
     </article>
