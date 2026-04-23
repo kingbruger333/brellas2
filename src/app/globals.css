@@ -40,6 +40,7 @@ a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
 main {
   display: block;
+  background: transparent;
 }
 
 .container {
