@@ -4,7 +4,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Brellas",
-  description: "Товары народного потребления оптом для магазинов, маркетплейсов и бизнеса."
+  description: "Товары народного потребления оптом для магазинов, маркетплейсов и бизнеса.",
+  icons: {
+    icon: "/favicon.ico", // или favicon.png
+  },
 };
 
 export default function RootLayout({
