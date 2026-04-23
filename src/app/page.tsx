@@ -6,6 +6,7 @@ import { ProductCard } from "@/components/product-card";
 import { SectionTitle } from "@/components/section-title";
 import { TelegramButton } from "@/components/telegram-button";
 import { PortableTextRenderer } from "@/components/portable-text";
+import { LeadForm } from "@/components/lead-form";
 import { getFeaturedProducts, getSiteSettings } from "@/lib/content";
 
 export const revalidate = 60;
@@ -192,19 +193,7 @@ export default async function HomePage() {
 
         <section className="section">
           <Container>
-            <div className="ctaBanner">
-              <div>
-                <span className="eyebrow">Заявка</span>
-                <h2>Быстрый переход к заявке</h2>
-                <p>Оставьте запрос, чтобы обсудить ассортимент, объёмы закупки и условия поставки для вашего бизнеса.</p>
-              </div>
-              <div className="ctaBannerActions">
-                <Link href="/catalog" className="secondaryButton">
-                  Смотреть каталог
-                </Link>
-                <TelegramButton href={settings?.telegramBotUrl || "#"} label="Связаться" />
-              </div>
-            </div>
+            <LeadForm telegramUrl={settings?.telegramBotUrl || "#"} />
           </Container>
         </section>
       </main>

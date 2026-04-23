@@ -765,6 +765,130 @@ main {
   margin: 14px 0 0;
 }
 
+.leadFormShell {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(360px, 1.2fr);
+  gap: 28px;
+  padding: 34px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(245, 245, 244, 0.98)),
+    radial-gradient(circle at 12% 18%, rgba(201, 160, 108, 0.16), transparent 30%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.leadFormIntro h2 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.leadFormIntro p,
+.leadField span,
+.leadFormMessage {
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.leadFormIntro p {
+  margin: 16px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.contactActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.leadForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.leadField {
+  display: grid;
+  gap: 8px;
+}
+
+.leadFieldWide {
+  grid-column: 1 / -1;
+}
+
+.leadField span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.leadField input,
+.leadField select,
+.leadField textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.86);
+  font: 0.96rem "Segoe UI", Arial, sans-serif;
+}
+
+.leadField textarea {
+  min-height: 104px;
+  padding-top: 14px;
+  resize: vertical;
+}
+
+.leadField input:focus,
+.leadField select:focus,
+.leadField textarea:focus {
+  outline: 2px solid rgba(138, 90, 50, 0.22);
+  border-color: rgba(138, 90, 50, 0.42);
+}
+
+.leadFormFooter {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+
+.leadFormFooter button {
+  cursor: pointer;
+}
+
+.leadFormFooter button:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.leadFormMessage {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.leadFormMessagesuccess {
+  color: #144d2d;
+}
+
+.leadFormMessageerror {
+  color: #8a1f1f;
+}
+
+.honeypotField {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
 .siteFooter {
   border-top: 1px solid var(--line);
   color: #ffffff;
@@ -825,6 +949,7 @@ main {
 
 @media (max-width: 1100px) {
   .heroCard,
+  .leadFormShell,
   .productLayout,
   .conditionsGrid,
   .featureGrid,
@@ -849,6 +974,8 @@ main {
   .siteHeaderInner,
   .siteFooterInner,
   .heroCard,
+  .leadFormShell,
+  .leadForm,
   .productLayout,
   .productGrid,
   .conditionsGrid,
@@ -870,6 +997,7 @@ main {
   .hero { padding-top: 28px; }
 
   .heroCard,
+  .leadFormShell,
   .catalogHeader,
   .highlightCard,
   .featureCard,
@@ -881,5 +1009,6 @@ main {
   }
 
   .productDetailPanel { position: static; }
+  .leadFieldWide { grid-column: auto; }
   .container { width: min(calc(100% - 24px), var(--container)); }
 }
