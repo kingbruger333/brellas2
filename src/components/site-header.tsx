@@ -52,6 +52,8 @@ export function SiteHeader({ siteTitle, categories = [], products = [] }: SiteHe
   const [isCatalogOpen, setIsCatalogOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
 
@@ -72,11 +74,17 @@ export function SiteHeader({ siteTitle, categories = [], products = [] }: SiteHe
     };
   }, []);
 
+  function closeMobilePanels() {
+    setIsCatalogOpen(false);
+    setIsMobileMenuOpen(false);
+    setIsMobileSearchOpen(false);
+  }
+
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const preparedQuery = normalizeHeaderSearch(query);
     router.push(preparedQuery ? `/catalog?q=${encodeURIComponent(preparedQuery)}` : "/catalog");
-    setIsCatalogOpen(false);
+    closeMobilePanels();
   }
 
   return (
@@ -94,7 +102,7 @@ export function SiteHeader({ siteTitle, categories = [], products = [] }: SiteHe
       </div>
 
       <Container className="siteHeaderInner">
-        <Link href="/" className="brand" aria-label="Brellas на главную">
+        <Link href="/" className="brand" aria-label="Brellas на главную" onClick={closeMobilePanels}>
           <span className="brandMark">B</span>
           <span>{siteTitle || "Brellas"}</span>
         </Link>
@@ -109,7 +117,10 @@ export function SiteHeader({ siteTitle, categories = [], products = [] }: SiteHe
           Каталог
         </button>
 
-        <form className="headerSearch" onSubmit={handleSearchSubmit}>
+        <form
+          className={`headerSearch ${isMobileSearchOpen ? "headerSearchOpen" : ""}`}
+          onSubmit={handleSearchSubmit}
+        >
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -140,6 +151,42 @@ export function SiteHeader({ siteTitle, categories = [], products = [] }: SiteHe
             {cartCount ? <b>{cartCount}</b> : null}
           </button>
         </nav>
+
+        <div className="mobileHeaderControls" aria-label="Мобильное меню">
+          <button
+            type="button"
+            className="mobileIconButton"
+            onClick={() => {
+              setIsMobileSearchOpen((current) => !current);
+              setIsMobileMenuOpen(false);
+            }}
+            aria-expanded={isMobileSearchOpen}
+            aria-label="Открыть поиск"
+          >
+            ⌕
+          </button>
+          <button
+            type="button"
+            className="mobileIconButton headerActionCounter"
+            onClick={() => setIsCartOpen(true)}
+            aria-label="Открыть корзину"
+          >
+            Корзина
+            {cartCount ? <b>{cartCount}</b> : null}
+          </button>
+          <button
+            type="button"
+            className="mobileIconButton"
+            onClick={() => {
+              setIsMobileMenuOpen((current) => !current);
+              setIsMobileSearchOpen(false);
+            }}
+            aria-expanded={isMobileMenuOpen}
+            aria-label="Открыть меню"
+          >
+            ☰
+          </button>
+        </div>
       </Container>
 
       <Container className="headerMarketMenu">
@@ -149,6 +196,26 @@ export function SiteHeader({ siteTitle, categories = [], products = [] }: SiteHe
         <a href="/#wholesale">Оптовые закупки</a>
         <a href="/#lead-form">Заказать подбор</a>
       </Container>
+
+      {isMobileMenuOpen ? (
+        <Container className="mobileMenuPanel">
+          <Link href="/catalog" onClick={closeMobilePanels}>
+            Каталог
+          </Link>
+          <a href="/#marketplaces" onClick={closeMobilePanels}>
+            Маркетплейсы
+          </a>
+          <a href="/#wholesale" onClick={closeMobilePanels}>
+            Оптовые условия
+          </a>
+          <a href="/#lead-form" onClick={closeMobilePanels}>
+            Контакты
+          </a>
+          <a href="/#lead-form" className="primaryButton" onClick={closeMobilePanels}>
+            Оставить заявку
+          </a>
+        </Container>
+      ) : null}
 
       {isCatalogOpen ? (
         <div className="catalogDropdown">

@@ -199,6 +199,11 @@ img {
   gap: 8px;
 }
 
+.mobileHeaderControls,
+.mobileMenuPanel {
+  display: none;
+}
+
 .headerAction {
   position: relative;
   display: inline-flex;
@@ -231,6 +236,36 @@ img {
   color: #fff;
   font-size: 12px;
   line-height: 21px;
+  text-align: center;
+}
+
+.mobileIconButton {
+  position: relative;
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 253, 248, 0.88);
+  color: var(--ink);
+  padding: 0 12px;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.mobileIconButton b {
+  position: absolute;
+  top: -7px;
+  right: -5px;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-size: 11px;
+  line-height: 20px;
   text-align: center;
 }
 
@@ -1828,6 +1863,21 @@ img {
 }
 
 @media (max-width: 860px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  .siteHeader {
+    z-index: 80;
+  }
+
+  .topUtilityBar,
+  .headerMarketMenu,
+  .catalogButton,
+  .headerActions {
+    display: none;
+  }
+
   .topUtilityInner,
   .siteFooterInner {
     align-items: flex-start;
@@ -1835,21 +1885,94 @@ img {
   }
 
   .siteHeaderInner {
-    grid-template-columns: 1fr auto;
-    padding: 14px 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    min-height: 64px;
+    padding: 10px 0;
   }
 
-  .catalogButton {
-    justify-self: end;
+  .brand {
+    min-width: 0;
+    font-size: 22px;
   }
 
-  .headerSearch,
-  .headerActions {
+  .brand span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .brandMark {
+    width: 40px;
+    height: 40px;
+    border-radius: 14px;
+    font-size: 20px;
+  }
+
+  .mobileHeaderControls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+  }
+
+  .mobileIconButton {
+    min-width: 42px;
+    min-height: 42px;
+    border-radius: 14px;
+    padding: 0 10px;
+  }
+
+  .mobileIconButton.headerActionCounter {
+    min-width: 84px;
+    font-size: 13px;
+  }
+
+  .headerSearch {
+    display: none;
     grid-column: 1 / -1;
+    grid-template-columns: 1fr auto;
+    min-height: 44px;
+    border-radius: 18px;
   }
 
-  .headerActions {
-    overflow-x: auto;
+  .headerSearchOpen {
+    display: grid;
+  }
+
+  .headerSearch input {
+    min-height: 44px;
+    padding: 0 13px;
+    font-size: 14px;
+  }
+
+  .headerSearch button {
+    min-height: 36px;
+    padding: 0 14px;
+  }
+
+  .mobileMenuPanel {
+    display: grid;
+    gap: 10px;
+    padding: 0 0 14px;
+  }
+
+  .mobileMenuPanel a {
+    display: flex;
+    min-height: 46px;
+    align-items: center;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(255, 253, 248, 0.92);
+    padding: 0 15px;
+    color: var(--ink);
+    font-weight: 900;
+  }
+
+  .mobileMenuPanel .primaryButton {
+    justify-content: center;
+    border: 0;
+    color: #fff;
   }
 
   .catalogDropdownInner {
@@ -1861,23 +1984,25 @@ img {
   }
 
   .marketHero {
-    min-height: 650px;
+    min-height: 560px;
   }
 
   .heroSlide {
     grid-template-columns: 1fr;
-    grid-template-rows: auto 220px;
+    grid-template-rows: auto 180px;
     align-content: start;
+    padding: 28px;
   }
 
   .marketHeroContent {
     min-height: auto;
+    padding-bottom: 0;
   }
 
   .heroVisual {
     justify-self: end;
-    width: min(76%, 420px);
-    height: 220px;
+    width: min(70%, 360px);
+    height: 180px;
   }
 
   .heroVisualCard {
@@ -1893,6 +2018,7 @@ img {
 
   .productGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
   }
 
   .productMainImage img {
@@ -1914,60 +2040,73 @@ img {
   }
 
   .brand {
-    font-size: 21px;
+    gap: 8px;
+    font-size: 20px;
   }
 
   .brandMark {
-    width: 40px;
-    height: 40px;
-  }
-
-  .headerSearch {
-    grid-template-columns: 1fr;
-    border-radius: 20px;
-  }
-
-  .headerSearch input {
-    min-height: 46px;
-  }
-
-  .headerSearch button {
-    min-height: 42px;
+    width: 38px;
+    height: 38px;
   }
 
   .marketHero {
     border-radius: 28px;
-    min-height: 650px;
+    min-height: 520px;
   }
 
   .marketHero h1 {
-    font-size: 38px;
+    font-size: 34px;
+    line-height: 0.98;
   }
 
   .marketHero p {
-    margin: 18px 0 22px;
-    font-size: 16px;
+    margin: 14px 0 18px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .heroActions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    width: min(100%, 260px);
+  }
+
+  .heroActions .primaryButton,
+  .heroActions .secondaryButtonFilled {
+    width: 100%;
   }
 
   .heroSlide {
-    grid-template-rows: auto 190px;
-    padding: 24px;
+    grid-template-rows: auto 150px;
+    padding: 22px;
   }
 
   .marketHeroContent {
-    padding-bottom: 64px;
+    padding-bottom: 54px;
   }
 
   .heroVisual {
     justify-self: center;
-    width: min(100%, 330px);
-    height: 190px;
+    width: min(100%, 300px);
+    height: 150px;
     opacity: 0.9;
   }
 
+  .heroVisualCard {
+    min-width: 86px;
+    min-height: 36px;
+    font-size: 12px;
+  }
+
   .heroSliderControls {
-    right: 20px;
-    bottom: 20px;
+    right: 18px;
+    bottom: 18px;
+  }
+
+  .heroSliderControls button {
+    width: 40px;
+    height: 40px;
   }
 
   .catalogDropdownGrid,
@@ -1983,6 +2122,7 @@ img {
   .drawerPanel {
     width: 100%;
     padding: 18px;
+    overflow: hidden;
   }
 
   .drawerProduct {
