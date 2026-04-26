@@ -2,6 +2,7 @@ import { defineConfig } from "sanity";
 import { structureTool } from "sanity/structure";
 import { schemaTypes } from "./src/sanity/schemaTypes";
 import { DuplicateProductAction } from "./src/sanity/actions/duplicateProductAction";
+import { BrellasStudioLayout } from "./src/sanity/components/BrellasStudioTheme";
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "your_project_id";
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
@@ -13,6 +14,14 @@ export default defineConfig({
   projectId,
   dataset,
   plugins: [
+    {
+      name: "brellas-theme-picker",
+      studio: {
+        components: {
+          layout: BrellasStudioLayout
+        }
+      }
+    },
     structureTool({
       structure: (S) =>
         S.list()
