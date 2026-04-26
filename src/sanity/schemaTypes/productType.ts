@@ -1,31 +1,24 @@
 import { defineField, defineType } from "sanity";
 
+function validateMinimumOrder(value?: string) {
+  if (!value) {
+    return "Укажите минимальный заказ";
+  }
+
+  const number = Number(value.match(/\d+/)?.[0]);
+
+  if (!Number.isFinite(number) || number < 1) {
+    return "Минимальный заказ должен быть не меньше 1";
+  }
+
+  return true;
+}
+
 export const productType = defineType({
   name: "product",
   title: "Товар",
   type: "document",
-  groups: [
-    { name: "main", title: "Основное", default: true },
-    { name: "sale", title: "Продажа" },
-    { name: "photos", title: "Фото" },
-    { name: "service", title: "Служебное" }
-  ],
   fieldsets: [
-    {
-      name: "basic",
-      title: "Основная информация",
-      options: { collapsible: false }
-    },
-    {
-      name: "selling",
-      title: "Условия продажи",
-      options: { collapsible: false }
-    },
-    {
-      name: "media",
-      title: "Фотографии товара",
-      options: { collapsible: false }
-    },
     {
       name: "technical",
       title: "Служебные поля",
@@ -36,112 +29,33 @@ export const productType = defineType({
     defineField({
       name: "title",
       title: "Название товара",
-      description: "Название, которое увидит покупатель на сайте.",
+      description: "Как товар будет называться на сайте.",
       type: "string",
-      group: "main",
-      fieldset: "basic",
       validation: (rule) => rule.required().min(2)
     }),
     defineField({
-      name: "sku",
-      title: "Артикул",
-      description: "Внутренний код товара. Можно оставить пустым, если артикула нет.",
-      type: "string",
-      group: "main",
-      fieldset: "basic"
-    }),
-    defineField({
-      name: "category",
-      title: "Категория",
-      description: "Выберите раздел, в котором товар будет показан.",
-      type: "reference",
-      to: [{ type: "category" }],
-      group: "main",
-      fieldset: "basic",
-      validation: (rule) => rule.required()
-    }),
-    defineField({
-      name: "shortDescription",
-      title: "Краткое описание",
-      description: "Короткий текст для карточки товара. Лучше 1-2 предложения.",
-      type: "text",
-      rows: 3,
-      group: "main",
-      fieldset: "basic",
-      validation: (rule) => rule.required().max(220)
-    }),
-    defineField({
-      name: "description",
-      title: "Подробное описание",
-      description: "Описание для страницы товара: особенности, состав, комплектация, условия.",
-      type: "array",
-      of: [{ type: "block" }],
-      group: "main",
-      fieldset: "basic",
-      validation: (rule) => rule.required()
-    }),
-    defineField({
-      name: "price",
-      title: "Оптовая цена",
-      description: "Цена за единицу товара в рублях.",
-      type: "number",
-      group: "sale",
-      fieldset: "selling",
-      validation: (rule) => rule.required().positive()
-    }),
-    defineField({
-      name: "minOrder",
-      title: "Минимальный заказ",
-      description: "Например: от 10 шт. или от 30 000 ₽.",
-      type: "string",
-      group: "sale",
-      fieldset: "selling",
-      validation: (rule) => rule.required()
-    }),
-    defineField({
-      name: "available",
-      title: "В наличии",
-      description: "Выключите, если товар доступен только под заказ.",
-      type: "boolean",
-      group: "sale",
-      fieldset: "selling",
-      initialValue: true
-    }),
-    defineField({
-      name: "featured",
-      title: "Показывать на главной",
-      description: "Включите, если товар должен попасть в витрину на главной странице.",
-      type: "boolean",
-      group: "sale",
-      fieldset: "selling",
-      initialValue: true
-    }),
-    defineField({
       name: "image",
-      title: "Главное фото",
-      description: "Основное изображение товара для карточки и страницы товара.",
+      title: "Фото товара",
+      description: "Добавьте качественное фото товара",
       type: "image",
-      group: "photos",
-      fieldset: "media",
       options: {
         hotspot: true
       },
+      validation: (rule) => rule.required().warning("Фото желательно добавить перед публикацией"),
       fields: [
         defineField({
           name: "alt",
           title: "Описание фото",
-          description: "Короткое описание изображения для доступности и поиска.",
+          description: "Коротко опишите, что изображено на фото.",
           type: "string"
         })
       ]
     }),
     defineField({
       name: "gallery",
-      title: "Дополнительные фото",
+      title: "Дополнительные фото товара",
       description: "Добавьте другие ракурсы, упаковку или детали товара.",
       type: "array",
-      group: "photos",
-      fieldset: "media",
       of: [
         {
           type: "image",
@@ -152,12 +66,75 @@ export const productType = defineType({
       ]
     }),
     defineField({
+      name: "price",
+      title: "Цена",
+      description: "Укажите цену в рублях",
+      type: "number",
+      validation: (rule) => rule.required().positive()
+    }),
+    defineField({
+      name: "oldPrice",
+      title: "Старая цена",
+      description: "Заполните, если нужно показать прежнюю цену в админке.",
+      type: "number",
+      validation: (rule) => rule.positive().warning("Старая цена должна быть больше 0")
+    }),
+    defineField({
+      name: "sku",
+      title: "Артикул",
+      description: "Например: BR-001",
+      type: "string"
+    }),
+    defineField({
+      name: "category",
+      title: "Категория",
+      description: "Выберите раздел, в котором товар будет показан.",
+      type: "reference",
+      to: [{ type: "category" }],
+      validation: (rule) => rule.required()
+    }),
+    defineField({
+      name: "minOrder",
+      title: "Минимальный заказ",
+      description: "Минимальное количество для заказа, например 10",
+      type: "string",
+      validation: (rule) => rule.required().custom(validateMinimumOrder)
+    }),
+    defineField({
+      name: "description",
+      title: "Описание",
+      description: "Кратко опишите товар для клиента",
+      type: "array",
+      of: [{ type: "block" }],
+      validation: (rule) => rule.required()
+    }),
+    defineField({
+      name: "shortDescription",
+      title: "Краткое описание для карточки",
+      description: "Если заполнить, этот текст будет виден в карточке товара в каталоге.",
+      type: "text",
+      rows: 3,
+      validation: (rule) => rule.max(220).warning("Лучше уложиться в 1-2 предложения")
+    }),
+    defineField({
+      name: "featured",
+      title: "Популярный товар",
+      description: "Включите, если товар нужно показать в подборке популярных товаров.",
+      type: "boolean",
+      initialValue: false
+    }),
+    defineField({
+      name: "isNew",
+      title: "Новинка",
+      description: "Включите, если товар новый в ассортименте.",
+      type: "boolean",
+      initialValue: false
+    }),
+    defineField({
       name: "slug",
-      title: "Адрес страницы",
-      description: "Создаётся из названия. Нужен для ссылки на товар.",
+      title: "Ссылка товара",
+      description: "Создается из названия. Нужна для ссылки на товар.",
       type: "slug",
-      group: "service",
-      fieldset: "technical",
       options: {
         source: "title",
         maxLength: 96
@@ -165,11 +142,18 @@ export const productType = defineType({
       validation: (rule) => rule.required()
     }),
     defineField({
+      name: "available",
+      title: "В наличии",
+      description: "Выключите, если товар доступен только под заказ.",
+      type: "boolean",
+      fieldset: "technical",
+      initialValue: true
+    }),
+    defineField({
       name: "sortOrder",
       title: "Порядок сортировки",
       description: "Чем меньше число, тем выше товар в списках при ручной сортировке.",
       type: "number",
-      group: "service",
       fieldset: "technical",
       initialValue: 0
     })
@@ -180,13 +164,11 @@ export const productType = defineType({
       price: "price",
       sku: "sku",
       category: "category.title",
-      available: "available",
       media: "image"
     },
-    prepare({ title, price, sku, category, available, media }) {
-      const status = available ? "В наличии" : "Под заказ";
+    prepare({ title, price, sku, category, media }) {
       const priceText = typeof price === "number" ? `${price.toLocaleString("ru-RU")} ₽` : "Цена не указана";
-      const parts = [priceText, category, status, sku ? `арт. ${sku}` : ""].filter(Boolean);
+      const parts = [priceText, category, sku ? `арт. ${sku}` : ""].filter(Boolean);
 
       return {
         title: title || "Без названия",

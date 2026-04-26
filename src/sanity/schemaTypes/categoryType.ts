@@ -4,16 +4,7 @@ export const categoryType = defineType({
   name: "category",
   title: "Категория",
   type: "document",
-  groups: [
-    { name: "main", title: "Основное", default: true },
-    { name: "service", title: "Служебное" }
-  ],
   fieldsets: [
-    {
-      name: "content",
-      title: "Информация о категории",
-      options: { collapsible: false }
-    },
     {
       name: "technical",
       title: "Служебные поля",
@@ -26,8 +17,6 @@ export const categoryType = defineType({
       title: "Название категории",
       description: "Например: Товары для дома, Красота и уход, Канцелярия.",
       type: "string",
-      group: "main",
-      fieldset: "content",
       validation: (rule) => rule.required().min(2)
     }),
     defineField({
@@ -35,17 +24,13 @@ export const categoryType = defineType({
       title: "Описание категории",
       description: "Короткое пояснение для страницы категории. Можно оставить пустым.",
       type: "text",
-      rows: 3,
-      group: "main",
-      fieldset: "content"
+      rows: 3
     }),
     defineField({
       name: "slug",
-      title: "Адрес страницы",
-      description: "Создаётся из названия. Нужен для ссылки на категорию.",
+      title: "Ссылка категории",
+      description: "Создается из названия. Нужна для ссылки на категорию.",
       type: "slug",
-      group: "service",
-      fieldset: "technical",
       options: {
         source: "title",
         maxLength: 96
@@ -57,7 +42,6 @@ export const categoryType = defineType({
       title: "Порядок сортировки",
       description: "Чем меньше число, тем выше категория в списке.",
       type: "number",
-      group: "service",
       fieldset: "technical",
       initialValue: 0
     })
