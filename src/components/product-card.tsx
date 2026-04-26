@@ -4,6 +4,7 @@ import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
 import { urlFor } from "@/lib/sanity.image";
 import { LeadChoiceButton } from "./lead-choice-button";
+import { ProductActions } from "./product-actions";
 
 type ProductCardProps = {
   product: Product;
@@ -13,31 +14,35 @@ type ProductCardProps = {
 export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
   const categoryTitle = product.category?.title;
   const imageUrl = product.image?.asset?._ref
-    ? urlFor(product.image).width(720).height(720).fit("crop").url()
+    ? urlFor(product.image).width(760).height(700).fit("crop").url()
     : "/placeholder-product.jpg";
 
   return (
     <article className="productCard">
-      <Link href={`/catalog/${product.slug}`} className="productImageWrap">
+      <div className="productImageWrap">
+        <Link href={`/catalog/${product.slug}`} aria-label={`Открыть товар ${product.title}`}>
+          <Image
+            src={imageUrl}
+            alt={product.image?.alt || product.title}
+            width={760}
+            height={700}
+            sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 1020px) 50vw, 320px"
+            className="productImage"
+          />
+        </Link>
         <div className="productBadgeRow">
           <span className={`stockBadge ${product.available ? "stockBadgeAvailable" : "stockBadgeCustom"}`}>
             {product.available ? "В наличии" : "Под заказ"}
           </span>
           {categoryTitle ? <span className="categoryBadge">{categoryTitle}</span> : null}
         </div>
-        <Image
-          src={imageUrl}
-          alt={product.image?.alt || product.title}
-          width={720}
-          height={720}
-          sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 900px) 50vw, (max-width: 1100px) 33vw, 320px"
-          className="productImage"
-        />
-      </Link>
+        <ProductActions productId={product._id} minOrder={product.minOrder} />
+      </div>
+
       <div className="productCardBody">
         <div className="productMeta">
-          {categoryTitle ? <span>{categoryTitle}</span> : null}
           {product.sku ? <span>Артикул: {product.sku}</span> : null}
+          <span>Мин. заказ: {product.minOrder}</span>
         </div>
         <Link href={`/catalog/${product.slug}`} className="productTitle">
           {product.title}
@@ -45,12 +50,8 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
         <p className="productDescription">{product.shortDescription}</p>
         <div className="productPriceRow">
           <div className="priceBlock">
-            <span className="priceLabel">Цена за единицу</span>
+            <span className="priceLabel">Оптовая цена</span>
             <strong>{formatPrice(product.price)}</strong>
-          </div>
-          <div className="minOrderBlock">
-            <span className="priceLabel">Минимальный заказ</span>
-            <span className="minOrderValue">{product.minOrder}</span>
           </div>
         </div>
         <div className="productCardActions">
@@ -59,7 +60,7 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
           </Link>
           <LeadChoiceButton
             telegramUrl={telegramBotUrl}
-            label="Оставить заявку"
+            label="Заказать"
             product={{
               title: product.title,
               sku: product.sku,

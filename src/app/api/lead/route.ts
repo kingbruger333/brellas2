@@ -6,7 +6,17 @@ import { apiVersion, dataset, projectId } from "@/lib/sanity.env";
 
 export const runtime = "nodejs";
 
+type CartLeadItem = {
+  title?: string;
+  sku?: string;
+  price?: number;
+  quantity?: number;
+  total?: number;
+  minOrder?: number;
+};
+
 type LeadPayload = {
+  source?: string;
   name?: string;
   phone?: string;
   items?: string;
@@ -17,11 +27,13 @@ type LeadPayload = {
   address?: string;
   comment?: string;
   website?: string;
+  cartItems?: CartLeadItem[];
+  cartTotal?: number;
 };
 
 type SavedLead = {
   id: string;
-  source: "site";
+  source: "site" | "cart";
   createdAt: string;
   name: string;
   phone: string;
@@ -31,6 +43,8 @@ type SavedLead = {
   shippingService: string;
   address: string;
   comment: string;
+  cartItems: Required<CartLeadItem>[];
+  cartTotal: number;
 };
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || process.env.BOT_TOKEN || "";
@@ -64,49 +78,118 @@ function phoneIsValid(phone: string): boolean {
   return phone.replace(/\D/g, "").length >= PHONE_MIN_DIGITS;
 }
 
+function formatCurrency(value: number) {
+  return new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "RUB",
+    maximumFractionDigits: 0
+  }).format(value);
+}
+
+function normalizeCartItems(items: unknown): Required<CartLeadItem>[] {
+  if (!Array.isArray(items)) return [];
+
+  return items
+    .map((item) => {
+      const rawItem = item as CartLeadItem;
+      const title = clean(rawItem.title);
+      const price = Number(rawItem.price) || 0;
+      const quantity = Number(rawItem.quantity) || 0;
+      const minOrder = Number(rawItem.minOrder) || 1;
+      const total = Number(rawItem.total) || price * quantity;
+
+      return {
+        title,
+        sku: clean(rawItem.sku),
+        price,
+        quantity,
+        total,
+        minOrder
+      };
+    })
+    .filter((item) => item.title && item.quantity > 0);
+}
+
+function cartItemsToText(items: Required<CartLeadItem>[]) {
+  return items
+    .map((item, index) =>
+      [
+        `${index + 1}. ${item.title}`,
+        item.sku ? `арт. ${item.sku}` : "",
+        `${formatCurrency(item.price)} x ${item.quantity} = ${formatCurrency(item.total)}`
+      ]
+        .filter(Boolean)
+        .join(", ")
+    )
+    .join("\n");
+}
+
+function validateCartMinimums(items: Required<CartLeadItem>[]) {
+  const invalidItem = items.find((item) => item.quantity < item.minOrder);
+  return invalidItem
+    ? `Минимальный заказ для товара "${invalidItem.title}" — ${invalidItem.minOrder}.`
+    : "";
+}
+
 function validateLead(payload: LeadPayload): { lead?: SavedLead; error?: string } {
   if (clean(payload.website)) {
     return { error: "Заявка отклонена." };
   }
 
+  const source: SavedLead["source"] = payload.source === "cart" ? "cart" : "site";
+  const cartItems = normalizeCartItems(payload.cartItems);
+  const isCartLead = source === "cart" || cartItems.length > 0;
   const name = clean(payload.name);
   const phone = clean(payload.phone);
-  const items = clean(payload.items);
-  const quantity = clean(payload.quantity);
+  const items = isCartLead ? cartItemsToText(cartItems) : clean(payload.items);
+  const quantity = isCartLead
+    ? String(cartItems.reduce((sum, item) => sum + item.quantity, 0))
+    : clean(payload.quantity);
   const deliveryMethod = clean(payload.deliveryMethod);
   const rawShippingService = clean(payload.shippingService);
   const customShippingService = clean(payload.customShippingService);
   const shippingService = rawShippingService === "Другая" ? customShippingService : rawShippingService;
   const address = clean(payload.address);
   const comment = clean(payload.comment);
+  const cartTotal = Number(payload.cartTotal) || cartItems.reduce((sum, item) => sum + item.total, 0);
 
   if (!name) return { error: "Введите имя." };
   if (!phone || !phoneIsValid(phone)) return { error: "Введите корректный телефон." };
-  if (!items) return { error: "Введите товары или артикулы." };
-  if (!quantity) return { error: "Введите количество." };
-  if (!["Самовывоз", "Доставка по городу", "Транспортная компания"].includes(deliveryMethod)) {
-    return { error: "Выберите способ получения." };
-  }
-  if (deliveryMethod === "Транспортная компания" && !shippingService) {
-    return { error: "Выберите службу доставки." };
-  }
-  if (deliveryMethod !== "Самовывоз" && !address) {
-    return { error: "Введите адрес, город или ПВЗ." };
+
+  if (isCartLead) {
+    if (!cartItems.length) return { error: "Корзина пуста." };
+    const minimumError = validateCartMinimums(cartItems);
+    if (minimumError) return { error: minimumError };
+  } else {
+    if (!items) return { error: "Введите товары или артикулы." };
+    if (!quantity) return { error: "Введите количество." };
+    if (!["Самовывоз", "Доставка по городу", "Транспортная компания"].includes(deliveryMethod)) {
+      return { error: "Выберите способ получения." };
+    }
+    if (deliveryMethod === "Транспортная компания" && !shippingService) {
+      return { error: "Выберите службу доставки." };
+    }
+    if (deliveryMethod !== "Самовывоз" && !address) {
+      return { error: "Введите адрес, город или ПВЗ." };
+    }
   }
 
   return {
     lead: {
       id: crypto.randomUUID(),
-      source: "site",
+      source,
       createdAt: new Date().toISOString(),
       name,
       phone,
       items,
       quantity,
-      deliveryMethod,
-      shippingService: deliveryMethod === "Транспортная компания" ? shippingService : "",
-      address: deliveryMethod === "Самовывоз" ? "" : address,
-      comment
+      deliveryMethod: isCartLead ? "Не выбран" : deliveryMethod,
+      shippingService:
+        !isCartLead && deliveryMethod === "Транспортная компания" ? shippingService : "",
+      address: !isCartLead && deliveryMethod !== "Самовывоз" ? address : "",
+      comment,
+      cartItems,
+      cartTotal
     }
   };
 }
@@ -117,25 +200,29 @@ function formatLeadMessage(lead: SavedLead): string {
     timeStyle: "short",
     timeZone: "Europe/Moscow"
   }).format(new Date(lead.createdAt));
+  const isCartLead = lead.source === "cart";
 
   return [
-    "НОВАЯ ЗАЯВКА (с сайта)",
+    isCartLead ? "НОВАЯ ЗАЯВКА ИЗ КОРЗИНЫ" : "НОВАЯ ЗАЯВКА С САЙТА",
     "",
     `Имя: ${lead.name}`,
     `Телефон: ${lead.phone}`,
     "",
-    `Товары: ${lead.items}`,
-    `Количество: ${lead.quantity}`,
+    isCartLead ? "Товары в заказе:" : `Товары: ${lead.items}`,
+    isCartLead ? lead.items : `Количество: ${lead.quantity}`,
+    isCartLead ? `Общая сумма: ${formatCurrency(lead.cartTotal)}` : "",
     "",
-    `Получение: ${lead.deliveryMethod}`,
-    `Служба доставки: ${lead.shippingService || "не требуется"}`,
-    `Адрес: ${lead.address || "не требуется"}`,
+    isCartLead ? "" : `Получение: ${lead.deliveryMethod}`,
+    isCartLead ? "" : `Служба доставки: ${lead.shippingService || "не требуется"}`,
+    isCartLead ? "" : `Адрес: ${lead.address || "не требуется"}`,
     "",
     `Комментарий: ${lead.comment || "нет"}`,
     "",
     `Дата: ${date}`,
     `ID: ${lead.id}`
-  ].join("\n");
+  ]
+    .filter((line, index, lines) => line || lines[index - 1])
+    .join("\n");
 }
 
 async function saveLeadToFile(lead: SavedLead): Promise<string> {
@@ -169,7 +256,9 @@ async function saveLead(lead: SavedLead): Promise<"sanity" | "file" | "tmp-file"
         deliveryMethod: lead.deliveryMethod,
         shippingService: lead.shippingService,
         address: lead.address,
-        comment: lead.comment
+        comment: lead.comment,
+        cartItems: lead.cartItems,
+        cartTotal: lead.cartTotal
       });
       return "sanity";
     } catch (sanityError) {

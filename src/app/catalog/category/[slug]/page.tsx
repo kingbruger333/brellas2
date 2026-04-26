@@ -28,7 +28,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <>
-      <SiteHeader siteTitle={settings?.siteTitle || "Brellas"} />
+      <SiteHeader siteTitle={settings?.siteTitle || "Brellas"} categories={categories} products={products} />
       <main>
         <Container>
           <Suspense>

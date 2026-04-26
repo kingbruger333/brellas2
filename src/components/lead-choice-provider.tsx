@@ -88,11 +88,11 @@ function LeadChoiceModal({ isOpen, request, onClose, onChooseForm }: LeadChoiceM
           ×
         </button>
         <span className="eyebrow">Заявка</span>
-        <h2 id="lead-choice-title">Как вам удобно оставить заявку?</h2>
-        <p>Выберите подходящий способ связи. Форму можно заполнить на сайте или продолжить общение в удобном канале.</p>
+        <h2 id="lead-choice-title">Как удобно оформить запрос?</h2>
+        <p>Выберите способ связи. Форму можно заполнить на сайте или продолжить общение в Telegram.</p>
         <div className="leadChoiceActions">
           <button type="button" className="primaryButton" onClick={onChooseForm}>
-            Заполнить форму на сайте
+            Заполнить форму
           </button>
           <a
             href={buildContactHref(request.telegramUrl, request.product?.title)}

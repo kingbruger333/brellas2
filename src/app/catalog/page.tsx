@@ -16,7 +16,7 @@ export default async function CatalogPage() {
 
   return (
     <>
-      <SiteHeader siteTitle={settings?.siteTitle || "Brellas"} />
+      <SiteHeader siteTitle={settings?.siteTitle || "Brellas"} categories={categories} products={products} />
       <main>
         <Container>
           <Suspense>

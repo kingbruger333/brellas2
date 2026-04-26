@@ -87,7 +87,7 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
     }
 
     setStatus("success");
-    setMessage("Заявка отправлена, мы свяжемся с вами");
+    setMessage("Заявка отправлена. Мы свяжемся с вами.");
     setForm(initialForm);
   }
 
@@ -96,11 +96,17 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
       <div className="leadFormIntro">
         <span className="eyebrow">Заявка</span>
         <h2>Оставить заявку на оптовую поставку</h2>
-        <p>Заполните форму, и менеджер уточнит наличие, объём и условия получения.</p>
+        <p>Заполните форму, и менеджер уточнит наличие, объем, цену и удобный способ получения.</p>
         <div className="contactActions">
-          <LeadChoiceButton telegramUrl={telegramUrl} label="Оставить заявку" className="primaryButton" />
-          {telegramUrl !== "#" ? <a href={telegramUrl} className="secondaryButton" target="_blank" rel="noreferrer">Telegram</a> : null}
-          <a href="tel:+79772554989" className="secondaryButton">Позвонить</a>
+          <LeadChoiceButton telegramUrl={telegramUrl} label="Выбрать способ связи" className="primaryButton" />
+          {telegramUrl !== "#" ? (
+            <a href={telegramUrl} className="secondaryButton" target="_blank" rel="noreferrer">
+              Telegram
+            </a>
+          ) : null}
+          <a href="tel:+79772554989" className="secondaryButton">
+            Позвонить
+          </a>
         </div>
       </div>
 
@@ -140,7 +146,7 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
             onChange={(event) => updateField("items", event.target.value)}
             required
             rows={3}
-            placeholder="Например: A123, B52, C991"
+            placeholder="Например: товар, артикул, категория"
           />
         </label>
 
@@ -153,7 +159,9 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
           <span>Способ получения *</span>
           <select value={form.deliveryMethod} onChange={(event) => updateField("deliveryMethod", event.target.value)}>
             {deliveryMethods.map((method) => (
-              <option key={method} value={method}>{method}</option>
+              <option key={method} value={method}>
+                {method}
+              </option>
             ))}
           </select>
         </label>
@@ -164,7 +172,9 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
               <span>Служба доставки *</span>
               <select value={form.shippingService} onChange={(event) => updateField("shippingService", event.target.value)}>
                 {shippingServices.map((service) => (
-                  <option key={service} value={service}>{service}</option>
+                  <option key={service} value={service}>
+                    {service}
+                  </option>
                 ))}
               </select>
             </label>
@@ -184,7 +194,7 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
 
         {needsAddress ? (
           <label className="leadField leadFieldWide">
-            <span>Адрес / Город / ПВЗ *</span>
+            <span>Адрес / город / ПВЗ *</span>
             <input value={form.address} onChange={(event) => updateField("address", event.target.value)} required />
           </label>
         ) : null}
@@ -200,7 +210,9 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
           </button>
           {message ? <p className={`leadFormMessage leadFormMessage${status}`}>{message}</p> : null}
           {status === "success" && telegramUrl !== "#" ? (
-            <a href={telegramUrl} className="secondaryButton" target="_blank" rel="noreferrer">Написать в Telegram</a>
+            <a href={telegramUrl} className="secondaryButton" target="_blank" rel="noreferrer">
+              Написать в Telegram
+            </a>
           ) : null}
         </div>
       </form>

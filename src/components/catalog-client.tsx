@@ -17,8 +17,207 @@ type CatalogClientProps = {
 
 type SortValue = "manual" | "price-asc" | "price-desc" | "newest";
 
-function normalizeSearch(value: string) {
-  return value.trim().toLowerCase();
+type SearchMatch = {
+  product: Product;
+  rank: number;
+  score: number;
+};
+
+const QUERY_STOP_WORDS = new Set(["арт", "артикул", "sku", "код", "товар", "товары"]);
+
+const CYRILLIC_TO_LATIN: Record<string, string> = {
+  а: "a",
+  б: "b",
+  в: "v",
+  г: "g",
+  д: "d",
+  е: "e",
+  ж: "zh",
+  з: "z",
+  и: "i",
+  й: "y",
+  к: "k",
+  л: "l",
+  м: "m",
+  н: "n",
+  о: "o",
+  п: "p",
+  р: "r",
+  с: "s",
+  т: "t",
+  у: "u",
+  ф: "f",
+  х: "h",
+  ц: "c",
+  ч: "ch",
+  ш: "sh",
+  щ: "sch",
+  ы: "y",
+  э: "e",
+  ю: "yu",
+  я: "ya",
+  ь: "",
+  ъ: ""
+};
+
+function normalizeText(value = "") {
+  return value
+    .toLowerCase()
+    .replaceAll("ё", "е")
+    .replace(/[^a-zа-я0-9]+/gi, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function transliterate(value: string) {
+  return normalizeText(value)
+    .split("")
+    .map((char) => CYRILLIC_TO_LATIN[char] ?? char)
+    .join("")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tokenize(value: string) {
+  return normalizeText(value)
+    .split(" ")
+    .map((token) => token.trim())
+    .filter(Boolean);
+}
+
+function levenshteinDistance(left: string, right: string) {
+  if (left === right) return 0;
+  if (!left.length) return right.length;
+  if (!right.length) return left.length;
+
+  const previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  const current = Array.from({ length: right.length + 1 }, () => 0);
+
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    current[0] = leftIndex;
+
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      const substitutionCost = left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1;
+      current[rightIndex] = Math.min(
+        current[rightIndex - 1] + 1,
+        previous[rightIndex] + 1,
+        previous[rightIndex - 1] + substitutionCost
+      );
+    }
+
+    for (let index = 0; index <= right.length; index += 1) {
+      previous[index] = current[index];
+    }
+  }
+
+  return previous[right.length];
+}
+
+function similarity(left: string, right: string) {
+  const maxLength = Math.max(left.length, right.length);
+  if (!maxLength) return 1;
+  return 1 - levenshteinDistance(left, right) / maxLength;
+}
+
+function buildProductSearchText(product: Product) {
+  return [
+    product.title,
+    product.category?.title,
+    product.sku,
+    product.shortDescription
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function getSearchMatch(product: Product, rawQuery: string): SearchMatch | null {
+  const normalizedQuery = normalizeText(rawQuery);
+
+  if (!normalizedQuery) {
+    return { product, rank: 3, score: 0 };
+  }
+
+  const searchableText = buildProductSearchText(product);
+  const normalizedText = normalizeText(searchableText);
+  const transliteratedText = transliterate(searchableText);
+  const compactText = `${normalizedText} ${transliteratedText}`.replace(/\s+/g, "");
+  const compactQuery = normalizedQuery.replace(/\s+/g, "");
+  const queryTokens = tokenize(normalizedQuery).filter((token) => !QUERY_STOP_WORDS.has(token));
+  const transliteratedQueryTokens = queryTokens.map(transliterate);
+  const textTokens = tokenize(`${normalizedText} ${transliteratedText}`);
+
+  if (compactQuery && compactText.includes(compactQuery)) {
+    return { product, rank: 0, score: compactQuery.length };
+  }
+
+  if (!queryTokens.length) {
+    return normalizedText.includes(normalizedQuery)
+      ? { product, rank: 0, score: normalizedQuery.length }
+      : null;
+  }
+
+  const exactMatches = queryTokens.filter((token, index) => {
+    const transliteratedToken = transliteratedQueryTokens[index];
+    return textTokens.includes(token) || textTokens.includes(transliteratedToken);
+  });
+
+  if (exactMatches.length === queryTokens.length) {
+    return { product, rank: 0, score: exactMatches.join("").length };
+  }
+
+  const fuzzyScores = queryTokens.map((token, index) => {
+    const transliteratedToken = transliteratedQueryTokens[index];
+    const bestTokenScore = Math.max(
+      ...textTokens.map((textToken) =>
+        Math.max(similarity(token, textToken), similarity(transliteratedToken, textToken))
+      )
+    );
+    return bestTokenScore;
+  });
+  const fuzzyAverage = fuzzyScores.reduce((sum, score) => sum + score, 0) / fuzzyScores.length;
+  const fuzzyThreshold = queryTokens.some((token) => token.length <= 4) ? 0.72 : 0.76;
+
+  if (fuzzyAverage >= fuzzyThreshold && fuzzyScores.every((score) => score >= 0.58)) {
+    return { product, rank: 1, score: fuzzyAverage };
+  }
+
+  const partialMatches = queryTokens.filter((token, index) => {
+    const transliteratedToken = transliteratedQueryTokens[index];
+    return textTokens.some(
+      (textToken) =>
+        textToken.includes(token) ||
+        token.includes(textToken) ||
+        textToken.includes(transliteratedToken) ||
+        transliteratedToken.includes(textToken)
+    );
+  });
+
+  if (partialMatches.length) {
+    return { product, rank: 2, score: partialMatches.join("").length };
+  }
+
+  return null;
+}
+
+function sortProducts(products: Product[], sort: SortValue) {
+  switch (sort) {
+    case "price-asc":
+      return [...products].sort((a, b) => a.price - b.price);
+    case "price-desc":
+      return [...products].sort((a, b) => b.price - a.price);
+    case "newest":
+      return [...products].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    default:
+      return [...products].sort((a, b) => {
+        if (a.sortOrder !== b.sortOrder) {
+          return a.sortOrder - b.sortOrder;
+        }
+
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+  }
 }
 
 export function CatalogClient({
@@ -38,40 +237,29 @@ export function CatalogClient({
   const activeCategorySlug = initialCategorySlug || searchParams.get("category") || "all";
 
   const filteredProducts = useMemo(() => {
-    const normalizedTerm = normalizeSearch(searchTerm);
+    const categoryProducts = products.filter(
+      (product) => activeCategorySlug === "all" || product.category?.slug === activeCategorySlug
+    );
 
-    let result = products.filter((product) => {
-      const matchesCategory =
-        activeCategorySlug === "all" || product.category?.slug === activeCategorySlug;
-      const matchesSearch =
-        !normalizedTerm || normalizeSearch(product.title).includes(normalizedTerm);
-
-      return matchesCategory && matchesSearch;
-    });
-
-    switch (sort) {
-      case "price-asc":
-        result = [...result].sort((a, b) => a.price - b.price);
-        break;
-      case "price-desc":
-        result = [...result].sort((a, b) => b.price - a.price);
-        break;
-      case "newest":
-        result = [...result].sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        break;
-      default:
-        result = [...result].sort((a, b) => {
-          if (a.sortOrder !== b.sortOrder) {
-            return a.sortOrder - b.sortOrder;
-          }
-
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        });
+    if (!normalizeText(searchTerm)) {
+      return sortProducts(categoryProducts, sort);
     }
 
-    return result;
+    return categoryProducts
+      .map((product) => getSearchMatch(product, searchTerm))
+      .filter((match): match is SearchMatch => Boolean(match))
+      .sort((left, right) => {
+        if (left.rank !== right.rank) {
+          return left.rank - right.rank;
+        }
+
+        if (right.score !== left.score) {
+          return right.score - left.score;
+        }
+
+        return left.product.sortOrder - right.product.sortOrder;
+      })
+      .map((match) => match.product);
   }, [activeCategorySlug, products, searchTerm, sort]);
 
   const categoryCounts = useMemo(() => {
@@ -95,8 +283,9 @@ export function CatalogClient({
     const params = new URLSearchParams(searchParams.toString());
 
     if (next.q !== undefined) {
-      if (next.q) {
-        params.set("q", next.q);
+      const preparedQuery = normalizeText(next.q);
+      if (preparedQuery) {
+        params.set("q", preparedQuery);
       } else {
         params.delete("q");
       }
@@ -122,11 +311,11 @@ export function CatalogClient({
     <section className="section">
       <div className="catalogShell">
         <div className="catalogHeader">
-          <span className="eyebrow">Ассортимент</span>
-          <h1>{categoryTitle || "Каталог"}</h1>
+          <span className="eyebrow">Каталог Brellas</span>
+          <h1>{categoryTitle || "Все товары"}</h1>
           <p>
             {categoryDescription ||
-              "Подборка товаров для магазинов, маркетплейсов и бизнеса с быстрым поиском и удобной сортировкой."}
+              "Выбирайте товары, сравнивайте цены и отправляйте заявку удобным способом."}
           </p>
         </div>
 
@@ -139,7 +328,7 @@ export function CatalogClient({
               id="catalog-search"
               className="catalogInput"
               type="search"
-              placeholder="Поиск товаров..."
+              placeholder="Название, категория, описание или артикул"
               value={searchTerm}
               onChange={(event) => updateQuery({ q: event.target.value })}
             />
@@ -156,7 +345,7 @@ export function CatalogClient({
               onChange={(event) => updateQuery({ sort: event.target.value as SortValue })}
             >
               <option value="manual">По порядку</option>
-              <option value="newest">Сначала новые</option>
+              <option value="newest">Сначала недавно добавленные</option>
               <option value="price-asc">Цена по возрастанию</option>
               <option value="price-desc">Цена по убыванию</option>
             </select>
@@ -187,7 +376,7 @@ export function CatalogClient({
 
         {hasActiveFilters ? (
           <div className="activeFilters">
-            <span>Подборка:</span>
+            <span>Активная подборка:</span>
             {activeCategoryTitle ? <span className="filterChip">{activeCategoryTitle}</span> : null}
             {searchTerm ? <span className="filterChip">Поиск: {searchTerm}</span> : null}
             {sort !== "manual" ? <span className="filterChip">Сортировка включена</span> : null}
@@ -209,8 +398,7 @@ export function CatalogClient({
           </div>
         ) : (
           <div className="emptyState">
-            <h2>По вашему запросу товаров пока нет</h2>
-            <p>Попробуйте изменить поисковую фразу или посмотреть все товары.</p>
+            <h2>Ничего не найдено. Попробуйте изменить запрос.</h2>
             <button type="button" className="primaryButton" onClick={resetFilters}>
               Сбросить фильтры
             </button>

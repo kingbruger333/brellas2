@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Brellas",
-  description: "Товары народного потребления оптом для магазинов, маркетплейсов и бизнеса.",
+  description: "Brellas - товары для магазинов, маркетплейсов и бизнеса с удобным заказом.",
   icons: {
     icon: "/icon.svg"
   }
@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru" className="siteRoot">
-      <body className="siteBody min-h-screen">
+      <body className="siteBody">
         <LeadChoiceProvider>{children}</LeadChoiceProvider>
       </body>
     </html>

@@ -6,7 +6,8 @@ export default function ProductNotFound() {
     <main className="section">
       <Container>
         <div className="emptyState">
-          <p>Товар не найден.</p>
+          <h1>Товар не найден</h1>
+          <p>Возможно, позиция была снята с публикации или изменила адрес.</p>
           <Link href="/catalog" className="primaryButton">
             Вернуться в каталог
           </Link>

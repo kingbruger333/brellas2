@@ -4,104 +4,88 @@ import { SiteHeader } from "@/components/site-header";
 import { Container } from "@/components/container";
 import { ProductCard } from "@/components/product-card";
 import { SectionTitle } from "@/components/section-title";
-import { PortableTextRenderer } from "@/components/portable-text";
 import { LeadForm } from "@/components/lead-form";
-import { getFeaturedProducts, getSiteSettings } from "@/lib/content";
+import { HeroSlider } from "@/components/hero-slider";
+import { getCategories, getFeaturedProducts, getProducts, getSiteSettings } from "@/lib/content";
 
 export const revalidate = 60;
 
-const advantages = [
-  {
-    title: "Оптовые цены",
-    text: "Понятные условия закупки и ассортимент, который удобно закупать для регулярных поставок."
-  },
-  {
-    title: "Широкий ассортимент",
-    text: "Подбираем востребованные позиции для повседневного спроса и стабильной оборачиваемости."
-  },
-  {
-    title: "Быстрая обработка заявок",
-    text: "Оперативно подтверждаем наличие, согласовываем объёмы и сопровождаем заказ на каждом этапе."
-  }
-];
-
 const benefits = [
   {
-    title: "Почему выбирают Brellas",
-    text: "Мы фокусируемся на товарах повседневного спроса, которые подходят для оптовой реализации и стабильных продаж."
+    title: "Быстрая доставка",
+    text: "Подберём удобный способ получения и поможем с отправкой заказа."
   },
   {
-    title: "Понятные условия сотрудничества",
-    text: "Каждая позиция сопровождается ценой и минимальным объёмом заказа, чтобы решение принималось быстро."
+    title: "Удобный заказ",
+    text: "Добавляйте товары в корзину, сохраняйте избранное и отправляйте заявку за пару минут."
   },
   {
-    title: "Удобно работать в масштабе",
-    text: "Ассортимент подходит для регулярных закупок, расширения матрицы и сезонного обновления предложения."
+    title: "Качественные товары",
+    text: "В каталоге собраны позиции для повседневного спроса и регулярных закупок."
   }
 ];
 
-const audience = [
+const marketplaceLinks = [
   {
-    title: "Для магазинов",
-    text: "Базовые и сезонные позиции для розничной полки, акций и регулярного пополнения ассортимента."
+    title: "Wildberries",
+    text: "Официальный магазин Brellas на Wildberries",
+    href: "https://www.wildberries.ru/brands/9097862-brellas",
+    icon: "wb"
   },
   {
-    title: "Для маркетплейсов",
-    text: "Товары с понятной подачей и хорошим потенциалом для онлайн-продаж и масштабирования."
-  },
-  {
-    title: "Для бизнеса",
-    text: "Подбор ассортимента для корпоративных закупок, подарочных наборов и операционных нужд."
+    title: "Ozon",
+    text: "Официальный магазин Brellas на Ozon",
+    href: "https://www.ozon.ru/seller/brellas/",
+    icon: "ozon"
   }
 ];
+
+function MarketplaceIcon({ type }: { type: string }) {
+  if (type === "wb") {
+    return (
+      <span className="marketplaceIcon marketplaceIconWb" aria-hidden="true">
+        <svg viewBox="0 0 48 48" role="img">
+          <rect width="48" height="48" rx="14" />
+          <path d="M13.5 17.5 17.2 31h3.7l2.6-8.1L26.1 31h3.7l4.7-13.5h-4l-2.5 8.4-2.7-8.4h-3.4l-2.7 8.4-2.5-8.4h-3.2Z" />
+        </svg>
+      </span>
+    );
+  }
+
+  return (
+    <span className="marketplaceIcon marketplaceIconOzon" aria-hidden="true">
+      <svg viewBox="0 0 48 48" role="img">
+        <rect width="48" height="48" rx="14" />
+        <path d="M13 24c0-6.1 4.6-10.5 11-10.5S35 17.9 35 24s-4.6 10.5-11 10.5S13 30.1 13 24Zm6 0c0 3 2 5.2 5 5.2s5-2.2 5-5.2-2-5.2-5-5.2-5 2.2-5 5.2Z" />
+      </svg>
+    </span>
+  );
+}
 
 export default async function HomePage() {
-  const [settings, featuredProducts] = await Promise.all([
+  const [settings, featuredProducts, products, categories] = await Promise.all([
     getSiteSettings(),
-    getFeaturedProducts()
+    getFeaturedProducts(),
+    getProducts(),
+    getCategories()
   ]);
-  const showcaseProducts = featuredProducts.slice(0, 8);
+
+  const popularProducts = (featuredProducts.length ? featuredProducts : products).slice(0, 8);
 
   return (
     <>
-      <SiteHeader siteTitle={settings?.siteTitle || "Brellas"} />
+      <SiteHeader siteTitle={settings?.siteTitle || "Brellas"} categories={categories} products={products} />
       <main>
-        <section className="hero">
-          <Container>
-            <div className="heroCard">
-              <div className="heroContent">
-                <span className="eyebrow">Brellas</span>
-                <h1>Brellas — товары народного потребления оптом</h1>
-                <p>Для магазинов, маркетплейсов и бизнеса</p>
-                <div className="heroActions">
-                  <Link href="/catalog" className="primaryButton">
-                    Смотреть каталог
-                  </Link>
-                  <Link href="/#lead-form" className="secondaryButtonFilled">
-                    Связаться
-                  </Link>
-                </div>
-              </div>
-              <aside className="heroAside">
-                {advantages.map((item) => (
-                  <div key={item.title} className="highlightCard">
-                    <strong>{item.title}</strong>
-                    <p>{item.text}</p>
-                  </div>
-                ))}
-              </aside>
-            </div>
-          </Container>
-        </section>
+        <Container className="homeShell">
+          <HeroSlider />
 
-        <section className="section">
-          <Container>
+          <section className="section" id="wholesale">
             <SectionTitle
               eyebrow="Преимущества"
-              title="Почему выбирают Brellas"
-              text="Поставляем ассортимент, который подходит для стабильной оптовой работы и понятен конечному покупателю."
+              title="Покупать в Brellas удобно"
+              text="Мы сделали каталог простым: выбирайте товары, сохраняйте нужное и отправляйте заявку удобным способом."
             />
-            <div className="featureGrid">
+            <div className="featureGrid featureGridCompact">
               {benefits.map((item) => (
                 <article key={item.title} className="featureCard">
                   <strong>{item.title}</strong>
@@ -109,94 +93,83 @@ export default async function HomePage() {
                 </article>
               ))}
             </div>
-          </Container>
-        </section>
+          </section>
 
-        <section className="section">
-          <Container>
+          <section className="categoryShowcase" aria-labelledby="home-categories-title">
+            <div className="sectionTitle">
+              <span className="eyebrow">Категории</span>
+              <h2 id="home-categories-title">Выберите раздел</h2>
+              <p>Откройте нужную категорию и быстро найдите товары для заказа.</p>
+            </div>
+            <div className="categoryGrid">
+              {categories.slice(0, 8).map((category) => {
+                const count = products.filter((product) => product.category?.slug === category.slug).length;
+
+                return (
+                  <Link key={category._id} href={`/catalog/category/${category.slug}`} className="categoryTile">
+                    <span>{category.title}</span>
+                    <small>{count} товаров</small>
+                  </Link>
+                );
+              })}
+              <Link href="/catalog" className="categoryTile categoryTileDark">
+                <span>Весь каталог</span>
+                <small>{products.length} товаров</small>
+              </Link>
+            </div>
+          </section>
+
+          <section className="section" id="popular">
             <SectionTitle
-              eyebrow="Витрина"
+              eyebrow="Популярное"
               title="Популярные товары"
-              text="Подборка товаров, которые удобно включать в ассортимент магазина, маркетплейса или корпоративной поставки."
+              text="Позиции, которые чаще всего выбирают для регулярных покупок и оптовых заказов."
             />
-            {showcaseProducts.length ? (
-              <div className="showcaseBlock">
-                <div className="showcaseScroller" aria-label="Популярные товары">
-                  {showcaseProducts.map((product) => (
-                    <ProductCard
-                      key={product._id}
-                      product={product}
-                      telegramBotUrl={settings?.telegramBotUrl || "#"}
-                    />
-                  ))}
-                </div>
-                <Link href="/catalog" className="primaryButton showcaseButton">
-                  Перейти в каталог
-                </Link>
+            {popularProducts.length ? (
+              <div className="productGrid">
+                {popularProducts.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    telegramBotUrl={settings?.telegramBotUrl || "#"}
+                  />
+                ))}
               </div>
             ) : (
-              <div className="emptyState">Товаров пока нет</div>
+              <div className="emptyState">Товары скоро появятся.</div>
             )}
-          </Container>
-        </section>
+          </section>
 
-        <section className="section" id="wholesale">
-          <Container>
-            <SectionTitle
-              eyebrow="Сотрудничество"
-              title="Условия оптового сотрудничества"
-              text="Мы строим работу так, чтобы закупка была понятной, а запуск заказа не занимал лишнего времени."
-            />
-            <div className="conditionsGrid">
-              <div className="conditionCard">
-                <strong>Минимальный объём</strong>
-                <p>Для каждой позиции указан минимальный заказ, чтобы вы сразу могли оценить формат закупки.</p>
-              </div>
-              <div className="conditionCard">
-                <strong>Понятная коммуникация</strong>
-                <p>Вы быстро получаете подтверждение по наличию, объёму и ключевым условиям поставки.</p>
-              </div>
-              <div className="conditionCard">
-                <strong>Ассортимент для роста</strong>
-                <p>Товары подходят для регулярных продаж, расширения матрицы и сезонных предложений.</p>
-              </div>
-              <div className="conditionCard">
-                <strong>Детали сотрудничества</strong>
-                <div className="richText">
-                  {settings?.wholesaleConditions ? (
-                    <PortableTextRenderer value={settings.wholesaleConditions} />
-                  ) : (
-                    <p>Условия сотрудничества уточняются по запросу.</p>
-                  )}
-                </div>
-              </div>
+          <section className="marketplacesBlock" id="marketplaces">
+            <div className="marketplacesIntro">
+              <span className="eyebrow">Официальные магазины Brellas</span>
+              <h2>Brellas на маркетплейсах</h2>
+              <p>Нас можно найти на популярных маркетплейсах — выбирайте удобный способ покупки.</p>
             </div>
-          </Container>
-        </section>
-
-        <section className="section">
-          <Container>
-            <SectionTitle
-              eyebrow="Кому подойдёт"
-              title="Для магазинов, маркетплейсов и бизнеса"
-              text="Brellas помогает собирать ассортимент под разные каналы продаж и закупочные задачи."
-            />
-            <div className="audienceGrid">
-              {audience.map((item) => (
-                <article key={item.title} className="audienceCard">
-                  <strong>{item.title}</strong>
-                  <p>{item.text}</p>
-                </article>
+            <div className="marketplaceCards">
+              {marketplaceLinks.map((marketplace) => (
+                <a
+                  key={marketplace.title}
+                  href={marketplace.href}
+                  className={`marketplaceCard marketplaceCard${marketplace.icon === "wb" ? "Wb" : "Ozon"}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <div className="marketplaceCardHead">
+                    <MarketplaceIcon type={marketplace.icon} />
+                    <span>{marketplace.title}</span>
+                  </div>
+                  <p>{marketplace.text}</p>
+                  <strong>Открыть магазин →</strong>
+                </a>
               ))}
             </div>
-          </Container>
-        </section>
+          </section>
 
-        <section className="section">
-          <Container>
+          <section className="section">
             <LeadForm telegramUrl={settings?.telegramBotUrl || "#"} />
-          </Container>
-        </section>
+          </section>
+        </Container>
       </main>
       <SiteFooter />
     </>

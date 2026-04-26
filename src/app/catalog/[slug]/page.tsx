@@ -6,7 +6,9 @@ import { SiteHeader } from "@/components/site-header";
 import { Container } from "@/components/container";
 import { PortableTextRenderer } from "@/components/portable-text";
 import { LeadChoiceButton } from "@/components/lead-choice-button";
-import { getProductBySlug, getSiteSettings } from "@/lib/content";
+import { ProductCard } from "@/components/product-card";
+import { ProductActions } from "@/components/product-actions";
+import { getCategories, getProductBySlug, getProducts, getSiteSettings } from "@/lib/content";
 import { formatPrice } from "@/lib/format";
 import { urlFor } from "@/lib/sanity.image";
 
@@ -18,9 +20,11 @@ export const revalidate = 60;
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  const [settings, product] = await Promise.all([
+  const [settings, product, products, categories] = await Promise.all([
     getSiteSettings(),
-    getProductBySlug(slug)
+    getProductBySlug(slug),
+    getProducts(),
+    getCategories()
   ]);
 
   if (!product) {
@@ -37,12 +41,19 @@ export default async function ProductPage({ params }: ProductPageProps) {
     : "/placeholder-product.jpg";
   const categoryTitle = product.category?.title;
   const categorySlug = product.category?.slug;
+  const relatedProducts = products
+    .filter((item) => item._id !== product._id && item.category?.slug === categorySlug)
+    .slice(0, 4);
 
   return (
     <>
-      <SiteHeader siteTitle={settings?.siteTitle || "Brellas"} />
+      <SiteHeader siteTitle={settings?.siteTitle || "Brellas"} categories={categories} products={products} />
       <main>
-        <Container>
+        <Container className="productPageShell">
+          <Link href="/catalog" className="backLink">
+            ← Вернуться в каталог
+          </Link>
+
           <section className="productLayout">
             <div className="productGallery">
               <div className="productMainImage">
@@ -101,22 +112,48 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <span className="priceLabel">Оптовая цена</span>
                 <strong>{formatPrice(product.price)}</strong>
               </div>
-              <div className="productCardActions">
+              <ProductActions productId={product._id} minOrder={product.minOrder} />
+              <div className="productCardActions productDetailActions">
                 <LeadChoiceButton
                   telegramUrl={settings?.telegramBotUrl || "#"}
-                  label="Оставить заявку"
+                  label="Заказать товар"
                   product={{
                     title: product.title,
                     sku: product.sku,
                     category: categoryTitle || undefined
                   }}
                 />
+                <Link href="/#lead-form" className="secondaryButton">
+                  Задать вопрос
+                </Link>
               </div>
               <div className="richText">
-                {product.description ? <PortableTextRenderer value={product.description} /> : null}
+                {product.description ? (
+                  <PortableTextRenderer value={product.description} />
+                ) : (
+                  <p>Подробности по комплектации, наличию и условиям поставки уточняются при заявке.</p>
+                )}
               </div>
             </div>
           </section>
+
+          {relatedProducts.length ? (
+            <section className="section">
+              <div className="sectionTitle">
+                <span className="eyebrow">Похожие товары</span>
+                <h2>Ещё в категории</h2>
+              </div>
+              <div className="productGrid">
+                {relatedProducts.map((item) => (
+                  <ProductCard
+                    key={item._id}
+                    product={item}
+                    telegramBotUrl={settings?.telegramBotUrl || "#"}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
         </Container>
       </main>
       <SiteFooter />
