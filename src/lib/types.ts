@@ -20,6 +20,14 @@ export type ProductCategory = {
   slug: string;
 };
 
+export type Subcategory = {
+  _id: string;
+  title: string;
+  slug: string;
+  description?: string;
+  parentCategory: ProductCategory | null;
+};
+
 export type Product = {
   _id: string;
   title: string;
@@ -30,6 +38,7 @@ export type Product = {
   shortDescription: string;
   description?: PortableTextBlock[];
   category: ProductCategory | null;
+  subcategory?: Subcategory | null;
   image?: SanityImage;
   gallery?: SanityImage[];
   featured?: boolean;

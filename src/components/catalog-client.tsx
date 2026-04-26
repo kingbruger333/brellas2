@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
-import { Category, Product } from "@/lib/types";
+import { Category, Product, Subcategory } from "@/lib/types";
 
 type CatalogClientProps = {
   products: Product[];
   categories: Category[];
+  subcategories: Subcategory[];
   telegramBotUrl: string;
   initialCategorySlug?: string;
   categoryTitle?: string;
@@ -123,6 +124,7 @@ function buildProductSearchText(product: Product) {
   return [
     product.title,
     product.category?.title,
+    product.subcategory?.title,
     product.sku,
     product.shortDescription
   ]
@@ -223,6 +225,7 @@ function sortProducts(products: Product[], sort: SortValue) {
 export function CatalogClient({
   products,
   categories,
+  subcategories,
   telegramBotUrl,
   initialCategorySlug,
   categoryTitle,
@@ -235,17 +238,33 @@ export function CatalogClient({
   const searchTerm = searchParams.get("q") || "";
   const sort = (searchParams.get("sort") as SortValue | null) || "manual";
   const activeCategorySlug = initialCategorySlug || searchParams.get("category") || "all";
+  const requestedSubcategorySlug = searchParams.get("subcategory") || "all";
+  const activeSubcategorySlug =
+    requestedSubcategorySlug === "all" ||
+    subcategories.some(
+      (subcategory) =>
+        subcategory.slug === requestedSubcategorySlug &&
+        (activeCategorySlug === "all" || subcategory.parentCategory?.slug === activeCategorySlug)
+    )
+      ? requestedSubcategorySlug
+      : "all";
 
   const filteredProducts = useMemo(() => {
     const categoryProducts = products.filter(
       (product) => activeCategorySlug === "all" || product.category?.slug === activeCategorySlug
     );
+    const subcategoryProducts = categoryProducts.filter(
+      (product) =>
+        activeSubcategorySlug === "all" ||
+        product.subcategory?.slug === activeSubcategorySlug ||
+        !product.subcategory
+    );
 
     if (!normalizeText(searchTerm)) {
-      return sortProducts(categoryProducts, sort);
+      return sortProducts(subcategoryProducts, sort);
     }
 
-    return categoryProducts
+    return subcategoryProducts
       .map((product) => getSearchMatch(product, searchTerm))
       .filter((match): match is SearchMatch => Boolean(match))
       .sort((left, right) => {
@@ -260,7 +279,15 @@ export function CatalogClient({
         return left.product.sortOrder - right.product.sortOrder;
       })
       .map((match) => match.product);
-  }, [activeCategorySlug, products, searchTerm, sort]);
+  }, [activeCategorySlug, activeSubcategorySlug, products, searchTerm, sort]);
+
+  const visibleSubcategories = useMemo(() => {
+    return subcategories.filter(
+      (subcategory) =>
+        activeCategorySlug === "all" ||
+        subcategory.parentCategory?.slug === activeCategorySlug
+    );
+  }, [activeCategorySlug, subcategories]);
 
   const categoryCounts = useMemo(() => {
     return products.reduce<Record<string, number>>((acc, product) => {
@@ -273,13 +300,29 @@ export function CatalogClient({
     }, {});
   }, [products]);
 
-  const hasActiveFilters = searchTerm || activeCategorySlug !== "all" || sort !== "manual";
+  const subcategoryCounts = useMemo(() => {
+    return products.reduce<Record<string, number>>((acc, product) => {
+      if (!product.subcategory?.slug) {
+        return acc;
+      }
+
+      acc[product.subcategory.slug] = (acc[product.subcategory.slug] || 0) + 1;
+      return acc;
+    }, {});
+  }, [products]);
+
+  const hasActiveFilters =
+    searchTerm || activeCategorySlug !== "all" || activeSubcategorySlug !== "all" || sort !== "manual";
   const activeCategoryTitle =
     activeCategorySlug === "all"
       ? ""
       : categories.find((category) => category.slug === activeCategorySlug)?.title;
+  const activeSubcategoryTitle =
+    activeSubcategorySlug === "all"
+      ? ""
+      : subcategories.find((subcategory) => subcategory.slug === activeSubcategorySlug)?.title;
 
-  function updateQuery(next: { q?: string; sort?: SortValue }) {
+  function updateQuery(next: { q?: string; sort?: SortValue; subcategory?: string }) {
     const params = new URLSearchParams(searchParams.toString());
 
     if (next.q !== undefined) {
@@ -296,6 +339,14 @@ export function CatalogClient({
         params.set("sort", next.sort);
       } else {
         params.delete("sort");
+      }
+    }
+
+    if (next.subcategory !== undefined) {
+      if (next.subcategory && next.subcategory !== "all") {
+        params.set("subcategory", next.subcategory);
+      } else {
+        params.delete("subcategory");
       }
     }
 
@@ -350,6 +401,25 @@ export function CatalogClient({
               <option value="price-desc">Цена по убыванию</option>
             </select>
           </div>
+
+          <div className="catalogSort">
+            <label htmlFor="catalog-subcategory" className="catalogLabel">
+              Подкатегория
+            </label>
+            <select
+              id="catalog-subcategory"
+              className="catalogSelect"
+              value={activeSubcategorySlug}
+              onChange={(event) => updateQuery({ subcategory: event.target.value })}
+            >
+              <option value="all">Все подкатегории</option>
+              {visibleSubcategories.map((subcategory) => (
+                <option key={subcategory._id} value={subcategory.slug}>
+                  {subcategory.title}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="categoryScroller" aria-label="Категории каталога">
@@ -374,10 +444,35 @@ export function CatalogClient({
           ))}
         </div>
 
+        {visibleSubcategories.length ? (
+          <div className="subcategoryScroller" aria-label="Подкатегории каталога">
+            <button
+              type="button"
+              className={`categoryChip ${activeSubcategorySlug === "all" ? "categoryChipActive" : ""}`}
+              onClick={() => updateQuery({ subcategory: "all" })}
+            >
+              Все подкатегории
+            </button>
+            {visibleSubcategories.map((subcategory) => (
+              <button
+                key={subcategory._id}
+                type="button"
+                className={`categoryChip ${
+                  activeSubcategorySlug === subcategory.slug ? "categoryChipActive" : ""
+                }`}
+                onClick={() => updateQuery({ subcategory: subcategory.slug })}
+              >
+                {subcategory.title} <span>{subcategoryCounts[subcategory.slug] || 0}</span>
+              </button>
+            ))}
+          </div>
+        ) : null}
+
         {hasActiveFilters ? (
           <div className="activeFilters">
             <span>Активная подборка:</span>
             {activeCategoryTitle ? <span className="filterChip">{activeCategoryTitle}</span> : null}
+            {activeSubcategoryTitle ? <span className="filterChip">{activeSubcategoryTitle}</span> : null}
             {searchTerm ? <span className="filterChip">Поиск: {searchTerm}</span> : null}
             {sort !== "manual" ? <span className="filterChip">Сортировка включена</span> : null}
             <button type="button" className="resetFiltersButton" onClick={resetFilters}>

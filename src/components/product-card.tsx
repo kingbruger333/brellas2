@@ -13,6 +13,8 @@ type ProductCardProps = {
 
 export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
   const categoryTitle = product.category?.title;
+  const subcategoryTitle = product.subcategory?.title;
+  const sectionTitle = [categoryTitle, subcategoryTitle].filter(Boolean).join(" / ");
   const imageUrl = product.image?.asset?._ref
     ? urlFor(product.image).width(760).height(700).fit("crop").url()
     : "/placeholder-product.jpg";
@@ -34,7 +36,7 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
           <span className={`stockBadge ${product.available ? "stockBadgeAvailable" : "stockBadgeCustom"}`}>
             {product.available ? "В наличии" : "Под заказ"}
           </span>
-          {categoryTitle ? <span className="categoryBadge">{categoryTitle}</span> : null}
+          {sectionTitle ? <span className="categoryBadge">{sectionTitle}</span> : null}
         </div>
         <ProductActions productId={product._id} minOrder={product.minOrder} />
       </div>
@@ -64,7 +66,7 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
             product={{
               title: product.title,
               sku: product.sku,
-              category: categoryTitle || undefined
+              category: sectionTitle || undefined
             }}
           />
         </div>

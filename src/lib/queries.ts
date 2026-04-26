@@ -13,6 +13,17 @@ const productSharedFields = `
     title,
     "slug": slug.current
   },
+  "subcategory": subcategory->{
+    _id,
+    title,
+    "slug": slug.current,
+    description,
+    "parentCategory": parentCategory->{
+      _id,
+      title,
+      "slug": slug.current
+    }
+  },
   image,
   available,
   sortOrder,
@@ -55,6 +66,20 @@ export const categoryBySlugQuery = groq`
     "slug": slug.current,
     description,
     sortOrder
+  }
+`;
+
+export const subcategoriesQuery = groq`
+  *[_type == "subcategory"] | order(parentCategory->sortOrder asc, parentCategory->title asc, title asc){
+    _id,
+    title,
+    "slug": slug.current,
+    description,
+    "parentCategory": parentCategory->{
+      _id,
+      title,
+      "slug": slug.current
+    }
   }
 `;
 

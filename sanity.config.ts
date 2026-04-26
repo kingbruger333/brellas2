@@ -29,6 +29,7 @@ export default defineConfig({
           .items([
             S.documentTypeListItem("product").title("Товары"),
             S.documentTypeListItem("category").title("Категории"),
+            S.documentTypeListItem("subcategory").title("Подкатегории"),
             S.documentTypeListItem("lead").title("Заявки"),
             S.divider(),
             S.documentTypeListItem("siteSettings").title("Настройки сайта")

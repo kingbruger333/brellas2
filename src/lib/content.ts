@@ -5,9 +5,10 @@ import {
   featuredProductsQuery,
   productBySlugQuery,
   productsQuery,
-  siteSettingsQuery
+  siteSettingsQuery,
+  subcategoriesQuery
 } from "./queries";
-import { Category, Product, SiteSettings } from "./types";
+import { Category, Product, SiteSettings, Subcategory } from "./types";
 
 export async function getSiteSettings() {
   return client.fetch<SiteSettings | null>(siteSettingsQuery);
@@ -19,6 +20,10 @@ export async function getCategories() {
 
 export async function getCategoryBySlug(slug: string) {
   return client.fetch<Category | null>(categoryBySlugQuery, { slug });
+}
+
+export async function getSubcategories() {
+  return client.fetch<Subcategory[]>(subcategoriesQuery);
 }
 
 export async function getProducts() {

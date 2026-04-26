@@ -36,7 +36,7 @@ export const productType = defineType({
     defineField({
       name: "image",
       title: "Фото товара",
-      description: "Добавьте качественное фото товара",
+      description: "Добавьте качественное фото товара.",
       type: "image",
       options: {
         hotspot: true
@@ -68,7 +68,7 @@ export const productType = defineType({
     defineField({
       name: "price",
       title: "Цена",
-      description: "Укажите цену в рублях",
+      description: "Укажите цену в рублях.",
       type: "number",
       validation: (rule) => rule.required().positive()
     }),
@@ -82,7 +82,7 @@ export const productType = defineType({
     defineField({
       name: "sku",
       title: "Артикул",
-      description: "Например: BR-001",
+      description: "Например: BR-001.",
       type: "string"
     }),
     defineField({
@@ -94,16 +94,37 @@ export const productType = defineType({
       validation: (rule) => rule.required()
     }),
     defineField({
+      name: "subcategory",
+      title: "Подкатегория",
+      description: "Выберите подкатегорию, если товар относится к более точному разделу",
+      type: "reference",
+      to: [{ type: "subcategory" }],
+      options: {
+        filter: ({ document }) => {
+          const categoryRef = (document?.category as { _ref?: string } | undefined)?._ref;
+
+          return categoryRef
+            ? {
+                filter: "parentCategory._ref == $categoryId",
+                params: { categoryId: categoryRef }
+              }
+            : {
+                filter: "defined(parentCategory._ref)"
+              };
+        }
+      }
+    }),
+    defineField({
       name: "minOrder",
       title: "Минимальный заказ",
-      description: "Минимальное количество для заказа, например 10",
+      description: "Минимальное количество для заказа, например 10.",
       type: "string",
       validation: (rule) => rule.required().custom(validateMinimumOrder)
     }),
     defineField({
       name: "description",
       title: "Описание",
-      description: "Кратко опишите товар для клиента",
+      description: "Кратко опишите товар для клиента.",
       type: "array",
       of: [{ type: "block" }],
       validation: (rule) => rule.required()
@@ -164,11 +185,14 @@ export const productType = defineType({
       price: "price",
       sku: "sku",
       category: "category.title",
+      subcategory: "subcategory.title",
       media: "image"
     },
-    prepare({ title, price, sku, category, media }) {
-      const priceText = typeof price === "number" ? `${price.toLocaleString("ru-RU")} ₽` : "Цена не указана";
-      const parts = [priceText, category, sku ? `арт. ${sku}` : ""].filter(Boolean);
+    prepare({ title, price, sku, category, subcategory, media }) {
+      const priceText =
+        typeof price === "number" ? `${price.toLocaleString("ru-RU")} ₽` : "Цена не указана";
+      const section = [category, subcategory].filter(Boolean).join(" / ");
+      const parts = [priceText, section, sku ? `арт. ${sku}` : ""].filter(Boolean);
 
       return {
         title: title || "Без названия",

@@ -41,6 +41,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     : "/placeholder-product.jpg";
   const categoryTitle = product.category?.title;
   const categorySlug = product.category?.slug;
+  const subcategoryTitle = product.subcategory?.title;
   const relatedProducts = products
     .filter((item) => item._id !== product._id && item.category?.slug === categorySlug)
     .slice(0, 4);
@@ -89,7 +90,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             <div className="productDetailPanel">
               <div className="detailTopRow">
-                {categoryTitle ? <span className="eyebrow">{categoryTitle}</span> : null}
+                {categoryTitle ? (
+                  <span className="eyebrow">
+                    {[categoryTitle, subcategoryTitle].filter(Boolean).join(" / ")}
+                  </span>
+                ) : null}
                 <span className={`stockBadge ${product.available ? "stockBadgeAvailable" : "stockBadgeCustom"}`}>
                   {product.available ? "В наличии" : "Под заказ"}
                 </span>
@@ -104,6 +109,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                     <Link href={`/catalog/category/${categorySlug}`} className="inlineLink">
                       {categoryTitle}
                     </Link>
+                    {subcategoryTitle ? ` / ${subcategoryTitle}` : ""}
                   </span>
                 ) : null}
               </div>
@@ -120,7 +126,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   product={{
                     title: product.title,
                     sku: product.sku,
-                    category: categoryTitle || undefined
+                    category: [categoryTitle, subcategoryTitle].filter(Boolean).join(" / ") || undefined
                   }}
                 />
                 <Link href="/#lead-form" className="secondaryButton">

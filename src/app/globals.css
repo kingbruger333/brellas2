@@ -1079,7 +1079,7 @@ img {
 
 .catalogControls {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
+  grid-template-columns: minmax(0, 1fr) 240px 240px;
   gap: 14px;
 }
 
@@ -1120,6 +1120,7 @@ img {
 }
 
 .categoryScroller,
+.subcategoryScroller,
 .activeFilters {
   display: flex;
   flex-wrap: wrap;
@@ -1136,6 +1137,7 @@ img {
   padding: 10px 14px;
   color: var(--muted);
   font-weight: 900;
+  cursor: pointer;
 }
 
 .categoryChip span {
