@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
@@ -71,9 +71,15 @@ export function FavoritesDrawer({ isOpen, products, onClose }: FavoritesDrawerPr
     };
   }, []);
 
-  const favoriteProducts = favoriteIds
-    .map((id) => products.find((product) => product._id === id))
-    .filter((product): product is Product => Boolean(product));
+  const productsById = useMemo(() => {
+    return new Map(products.map((product) => [product._id, product]));
+  }, [products]);
+
+  const favoriteProducts = useMemo(() => {
+    return favoriteIds
+      .map((id) => productsById.get(id))
+      .filter((product): product is Product => Boolean(product));
+  }, [favoriteIds, productsById]);
 
   function removeFavorite(productId: string) {
     const next = readFavorites().filter((id) => id !== productId);
@@ -89,7 +95,7 @@ export function FavoritesDrawer({ isOpen, products, onClose }: FavoritesDrawerPr
     emitUpdate();
   }
 
-  if (!isMounted) {
+  if (!isMounted || !isOpen) {
     return null;
   }
 

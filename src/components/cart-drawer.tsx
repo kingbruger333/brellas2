@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
@@ -76,13 +76,23 @@ export function CartDrawer({ isOpen, products, onClose }: CartDrawerProps) {
     };
   }, []);
 
-  const items = Object.entries(cart)
-    .map(([id, quantity]) => {
-      const product = products.find((item) => item._id === id);
-      return product ? { product, quantity } : null;
-    })
-    .filter((item): item is { product: Product; quantity: number } => Boolean(item));
-  const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const productsById = useMemo(() => {
+    return new Map(products.map((product) => [product._id, product]));
+  }, [products]);
+
+  const items = useMemo(() => {
+    return Object.entries(cart)
+      .map(([id, quantity]) => {
+        const product = productsById.get(id);
+        return product ? { product, quantity } : null;
+      })
+      .filter((item): item is { product: Product; quantity: number } => Boolean(item));
+  }, [cart, productsById]);
+
+  const total = useMemo(
+    () => items.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
+    [items]
+  );
 
   function changeQuantity(product: Product, delta: number) {
     const next = readCart();
@@ -185,7 +195,7 @@ export function CartDrawer({ isOpen, products, onClose }: CartDrawerProps) {
     window.setTimeout(onClose, 900);
   }
 
-  if (!isMounted) {
+  if (!isMounted || !isOpen) {
     return null;
   }
 

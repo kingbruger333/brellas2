@@ -30,6 +30,20 @@ export default defineConfig({
             S.documentTypeListItem("product").title("Товары"),
             S.documentTypeListItem("category").title("Категории"),
             S.documentTypeListItem("subcategory").title("Подкатегории"),
+            S.listItem()
+              .title("Товары по категориям")
+              .child(
+                S.documentTypeList("category")
+                  .title("Категории")
+                  .child((categoryId) =>
+                    S.documentList()
+                      .title("Товары категории")
+                      .schemaType("product")
+                      .filter('_type == "product" && category._ref == $categoryId')
+                      .params({ categoryId })
+                  )
+              ),
+            S.divider(),
             S.documentTypeListItem("lead").title("Заявки"),
             S.divider(),
             S.documentTypeListItem("siteSettings").title("Настройки сайта")

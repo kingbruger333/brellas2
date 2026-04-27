@@ -1,12 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Category, Product } from "@/lib/types";
-import { CartDrawer } from "./cart-drawer";
 import { Container } from "./container";
-import { FavoritesDrawer } from "./favorites-drawer";
 
 type SiteHeaderProps = {
   siteTitle: string;
@@ -17,6 +16,13 @@ type SiteHeaderProps = {
 const FAVORITES_KEY = "brellas:favorites";
 const CART_KEY = "brellas:cart";
 const STORE_EVENT = "brellas:store-updated";
+
+const CartDrawer = dynamic(() => import("./cart-drawer").then((mod) => mod.CartDrawer), {
+  ssr: false
+});
+const FavoritesDrawer = dynamic(() => import("./favorites-drawer").then((mod) => mod.FavoritesDrawer), {
+  ssr: false
+});
 
 function normalizeHeaderSearch(value: string) {
   return value
