@@ -933,7 +933,7 @@ img {
 .productImageWrap {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 1.08 / 1;
+  height: clamp(260px, 24vw, 320px);
   background: #f8f6f2;
 }
 
@@ -1239,12 +1239,6 @@ img {
   gap: 14px;
 }
 
-.productGalleryInteractive {
-  grid-template-columns: 86px minmax(0, 1fr);
-  align-items: start;
-  min-width: 0;
-}
-
 .productMainImage,
 .productThumb {
   overflow: hidden;
@@ -1257,51 +1251,49 @@ img {
 .productMainImage {
   position: relative;
   display: grid;
-  height: clamp(420px, 52vw, 620px);
-  min-height: 420px;
+  width: 100%;
+  height: 520px;
+  min-height: 520px;
   min-width: 0;
   place-items: center;
-  padding: clamp(14px, 2vw, 24px);
-}
-
-.productMainImage img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  object-fit: contain;
-  object-position: center;
+  border-radius: 28px;
   padding: 0;
 }
 
-.productThumbRail,
-.thumbGrid {
-  display: grid;
-  gap: 12px;
+.productMainImageMedia {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  padding: 24px;
 }
 
-.productThumbRail {
-  align-content: start;
-  max-height: 620px;
-  overflow: auto;
-  padding-right: 2px;
+.productThumbScroller,
+.thumbGrid {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scrollbar-width: thin;
 }
 
 .productThumb,
 .productThumbButton {
+  overflow: hidden;
+  flex: 0 0 82px;
+  width: 82px;
+  height: 82px;
+  border: 1px solid var(--line);
   border-radius: 20px;
+  background: #f8f6f2;
+  padding: 4px;
+  box-shadow: var(--shadow-soft);
 }
 
 .productThumbButton {
   display: grid;
-  overflow: hidden;
-  width: 100%;
-  aspect-ratio: 1;
   place-items: center;
-  border: 1px solid var(--line);
-  background: var(--surface);
-  padding: 4px;
-  box-shadow: var(--shadow-soft);
 }
 
 .productThumbButtonActive {
@@ -1309,21 +1301,12 @@ img {
   box-shadow: 0 0 0 3px rgba(184, 135, 70, 0.16), var(--shadow-soft);
 }
 
-.productThumb img,
-.productThumbButton img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center;
-}
-
-.galleryArrow {
+.productGalleryArrow {
   position: absolute;
   top: 50%;
   display: grid;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border: 1px solid rgba(229, 217, 199, 0.9);
   border-radius: 50%;
@@ -1335,24 +1318,21 @@ img {
   transform: translateY(-50%);
 }
 
-.galleryArrowPrev {
+.productGalleryArrowPrev {
   left: 14px;
 }
 
-.galleryArrowNext {
+.productGalleryArrowNext {
   right: 14px;
 }
 
-.galleryCounter {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  border-radius: 999px;
-  background: rgba(23, 22, 17, 0.78);
-  color: #fff;
-  padding: 7px 11px;
-  font-size: 13px;
-  font-weight: 900;
+.productThumb img,
+.productThumbButton img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .productDetailPanel {
@@ -2161,27 +2141,13 @@ img {
     gap: 14px;
   }
 
-  .productGalleryInteractive {
-    grid-template-columns: 1fr;
-  }
-
-  .productThumbRail {
-    order: 2;
-    grid-auto-flow: column;
-    grid-auto-columns: 72px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    max-height: none;
-    padding: 2px 0 4px;
-  }
-
   .productMainImage img {
     height: 100%;
   }
 
   .productMainImage {
-    height: 360px;
-    min-height: 360px;
+    height: 420px;
+    min-height: 420px;
   }
 
   .leadForm {
@@ -2309,7 +2275,11 @@ img {
 
   .productMainImage {
     height: 320px;
-    min-height: 300px;
+    min-height: 320px;
+  }
+
+  .productMainImageMedia {
+    padding: 14px;
   }
 
   .leadFormShell,

@@ -17,111 +17,68 @@ function imageUrl(image: SanityImage, width: number, height: number) {
 }
 
 export function ProductGallery({ images, title }: ProductGalleryProps) {
-  const safeImages = images.length ? images : [];
   const [activeIndex, setActiveIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const activeImage = safeImages[activeIndex];
-  const hasManyImages = safeImages.length > 1;
-
-  function showImage(index: number) {
-    setActiveIndex((index + safeImages.length) % safeImages.length);
-  }
-
-  function handleTouchEnd(clientX: number) {
-    if (touchStart === null || !hasManyImages) {
-      setTouchStart(null);
-      return;
-    }
-
-    const distance = clientX - touchStart;
-
-    if (Math.abs(distance) > 42) {
-      showImage(activeIndex + (distance < 0 ? 1 : -1));
-    }
-
-    setTouchStart(null);
-  }
-
-  if (!activeImage) {
-    return (
-      <div className="productGallery">
-        <div className="productMainImage">
-          <Image
-            src="/placeholder-product.jpg"
-            alt={title}
-            width={1280}
-            height={960}
-            sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 1100px) 50vw, 42vw"
-            priority
-          />
-        </div>
-      </div>
-    );
-  }
+  const mainImage = images[activeIndex];
+  const hasManyImages = images.length > 1;
+  const showPrevious = () => setActiveIndex((current) => (current - 1 + images.length) % images.length);
+  const showNext = () => setActiveIndex((current) => (current + 1) % images.length);
 
   return (
-    <div className="productGallery productGalleryInteractive">
-      {hasManyImages ? (
-        <div className="productThumbRail" aria-label="Фотографии товара">
-          {safeImages.map((image, index) => (
-            <button
-              key={`${image.asset?._ref || "photo"}-${index}`}
-              type="button"
-              className={`productThumbButton ${index === activeIndex ? "productThumbButtonActive" : ""}`}
-              onClick={() => showImage(index)}
-              aria-label={`Показать фото ${index + 1}`}
-              aria-current={index === activeIndex}
-            >
-              <Image
-                src={imageUrl(image, 180, 180)}
-                alt={image.alt || title}
-                width={180}
-                height={180}
-                sizes="72px"
-              />
-            </button>
-          ))}
-        </div>
-      ) : null}
-
-      <div
-        className="productMainImage productMainImageInteractive"
-        onTouchStart={(event) => setTouchStart(event.touches[0]?.clientX ?? null)}
-        onTouchEnd={(event) => handleTouchEnd(event.changedTouches[0]?.clientX ?? 0)}
-      >
+    <div className="productGallery">
+      <div className="productMainImage">
         <Image
-          key={`${activeImage.asset?._ref || "photo"}-${activeIndex}`}
-          src={imageUrl(activeImage, 1280, 960)}
-          alt={activeImage.alt || title}
+          src={mainImage ? imageUrl(mainImage, 1280, 960) : "/placeholder-product.jpg"}
+          alt={mainImage?.alt || title}
           width={1280}
           height={960}
           sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 1100px) 50vw, 42vw"
+          className="productMainImageMedia"
           priority
         />
         {hasManyImages ? (
           <>
             <button
               type="button"
-              className="galleryArrow galleryArrowPrev"
-              onClick={() => showImage(activeIndex - 1)}
+              className="productGalleryArrow productGalleryArrowPrev"
+              onClick={showPrevious}
               aria-label="Предыдущее фото"
             >
               ←
             </button>
             <button
               type="button"
-              className="galleryArrow galleryArrowNext"
-              onClick={() => showImage(activeIndex + 1)}
+              className="productGalleryArrow productGalleryArrowNext"
+              onClick={showNext}
               aria-label="Следующее фото"
             >
               →
             </button>
-            <div className="galleryCounter">
-              {activeIndex + 1} / {safeImages.length}
-            </div>
           </>
         ) : null}
       </div>
+
+      {hasManyImages ? (
+        <div className="productThumbScroller" aria-label="Фотографии товара">
+          {images.map((image, index) => (
+            <button
+              key={`${image.asset?._ref || "photo"}-${index}`}
+              type="button"
+              className={`productThumbButton ${index === activeIndex ? "productThumbButtonActive" : ""}`}
+              onClick={() => setActiveIndex(index)}
+              aria-label={`Показать фото ${index + 1}`}
+              aria-current={index === activeIndex}
+            >
+              <Image
+                src={imageUrl(image, 360, 360)}
+                alt={image.alt || title}
+                width={360}
+                height={360}
+                sizes="(max-width: 760px) 30vw, (max-width: 1100px) 16vw, 180px"
+              />
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
