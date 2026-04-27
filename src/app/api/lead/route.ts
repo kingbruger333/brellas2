@@ -59,6 +59,7 @@ const LEAD_STORAGE_DIRS = [
 ].filter(Boolean) as string[];
 const SANITY_API_WRITE_TOKEN = process.env.SANITY_API_WRITE_TOKEN || "";
 const PHONE_MIN_DIGITS = 7;
+const DELIVERY_METHODS = ["Самовывоз", "Доставка по городу", "Транспортная компания"];
 
 const sanityWriteClient = SANITY_API_WRITE_TOKEN
   ? createClient({
@@ -163,15 +164,16 @@ function validateLead(payload: LeadPayload): { lead?: SavedLead; error?: string 
   } else {
     if (!items) return { error: "Введите товары или артикулы." };
     if (!quantity) return { error: "Введите количество." };
-    if (!["Самовывоз", "Доставка по городу", "Транспортная компания"].includes(deliveryMethod)) {
-      return { error: "Выберите способ получения." };
-    }
-    if (deliveryMethod === "Транспортная компания" && !shippingService) {
-      return { error: "Выберите службу доставки." };
-    }
-    if (deliveryMethod !== "Самовывоз" && !address) {
-      return { error: "Введите адрес, город или ПВЗ." };
-    }
+  }
+
+  if (!DELIVERY_METHODS.includes(deliveryMethod)) {
+    return { error: "Выберите способ получения." };
+  }
+  if (deliveryMethod === "Транспортная компания" && !shippingService) {
+    return { error: "Выберите службу доставки." };
+  }
+  if (deliveryMethod !== "Самовывоз" && !address) {
+    return { error: "Введите адрес, город или ПВЗ." };
   }
 
   return {
@@ -183,10 +185,9 @@ function validateLead(payload: LeadPayload): { lead?: SavedLead; error?: string 
       phone,
       items,
       quantity,
-      deliveryMethod: isCartLead ? "Не выбран" : deliveryMethod,
-      shippingService:
-        !isCartLead && deliveryMethod === "Транспортная компания" ? shippingService : "",
-      address: !isCartLead && deliveryMethod !== "Самовывоз" ? address : "",
+      deliveryMethod,
+      shippingService: deliveryMethod === "Транспортная компания" ? shippingService : "",
+      address: deliveryMethod !== "Самовывоз" ? address : "",
       comment,
       cartItems,
       cartTotal
@@ -212,9 +213,9 @@ function formatLeadMessage(lead: SavedLead): string {
     isCartLead ? lead.items : `Количество: ${lead.quantity}`,
     isCartLead ? `Общая сумма: ${formatCurrency(lead.cartTotal)}` : "",
     "",
-    isCartLead ? "" : `Получение: ${lead.deliveryMethod}`,
-    isCartLead ? "" : `Служба доставки: ${lead.shippingService || "не требуется"}`,
-    isCartLead ? "" : `Адрес: ${lead.address || "не требуется"}`,
+    `Получение: ${lead.deliveryMethod}`,
+    `Служба доставки: ${lead.shippingService || "не требуется"}`,
+    `Адрес: ${lead.address || "не требуется"}`,
     "",
     `Комментарий: ${lead.comment || "нет"}`,
     "",

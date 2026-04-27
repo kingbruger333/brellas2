@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
+import { getProductMainPhoto } from "@/lib/product-photos";
 import { urlFor } from "@/lib/sanity.image";
 
 type FavoritesDrawerProps = {
@@ -46,8 +47,10 @@ function parseMinOrder(value?: string) {
 }
 
 function productImage(product: Product) {
-  return product.image?.asset?._ref
-    ? urlFor(product.image).width(220).height(220).fit("crop").url()
+  const mainPhoto = getProductMainPhoto(product);
+
+  return mainPhoto
+    ? urlFor(mainPhoto).width(220).height(220).fit("max").url()
     : "/placeholder-product.jpg";
 }
 

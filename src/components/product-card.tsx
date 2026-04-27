@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
+import { getProductMainPhoto } from "@/lib/product-photos";
 import { urlFor } from "@/lib/sanity.image";
 import { LeadChoiceButton } from "./lead-choice-button";
 import { ProductActions } from "./product-actions";
@@ -15,8 +16,9 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
   const categoryTitle = product.category?.title;
   const subcategoryTitle = product.subcategory?.title;
   const sectionTitle = [categoryTitle, subcategoryTitle].filter(Boolean).join(" / ");
-  const imageUrl = product.image?.asset?._ref
-    ? urlFor(product.image).width(760).height(700).fit("crop").url()
+  const mainPhoto = getProductMainPhoto(product);
+  const imageUrl = mainPhoto
+    ? urlFor(mainPhoto).width(760).height(700).fit("max").url()
     : "/placeholder-product.jpg";
 
   return (
@@ -25,7 +27,7 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
         <Link href={`/catalog/${product.slug}`} aria-label={`Открыть товар ${product.title}`}>
           <Image
             src={imageUrl}
-            alt={product.image?.alt || product.title}
+            alt={mainPhoto?.alt || product.title}
             width={760}
             height={700}
             sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 1020px) 50vw, 320px"

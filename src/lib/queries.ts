@@ -24,6 +24,7 @@ const productSharedFields = `
       "slug": slug.current
     }
   },
+  photos,
   image,
   available,
   sortOrder,

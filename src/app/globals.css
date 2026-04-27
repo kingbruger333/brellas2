@@ -861,6 +861,55 @@ img {
   grid-column: span 1;
 }
 
+.howToBuyBlock {
+  display: grid;
+  gap: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(circle at 96% 8%, rgba(184, 135, 70, 0.18), transparent 18rem),
+    rgba(255, 253, 248, 0.86);
+  padding: clamp(24px, 4vw, 42px);
+  box-shadow: var(--shadow-soft);
+}
+
+.howToBuySteps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.howToBuySteps article {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(229, 217, 199, 0.9);
+  border-radius: 24px;
+  background: var(--surface);
+  padding: 20px;
+}
+
+.howToBuySteps span {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: #171611;
+  color: #fff;
+  font-weight: 950;
+}
+
+.howToBuySteps strong {
+  font-size: 19px;
+  letter-spacing: -0.03em;
+}
+
+.howToBuySteps p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .productGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -885,7 +934,9 @@ img {
   position: relative;
   overflow: hidden;
   aspect-ratio: 1.08 / 1;
-  background: linear-gradient(135deg, #eee3d2, #fbf5e9);
+  background:
+    radial-gradient(circle at 50% 32%, rgba(255, 255, 255, 0.9), transparent 12rem),
+    linear-gradient(135deg, #f4ecdf, #fffaf0);
 }
 
 .productImageWrap a {
@@ -896,12 +947,13 @@ img {
 .productImage {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 16px;
   transition: transform 0.25s ease;
 }
 
 .productCard:hover .productImage {
-  transform: scale(1.045);
+  transform: scale(1.025);
 }
 
 .productBadgeRow {
@@ -1191,36 +1243,107 @@ img {
   gap: 14px;
 }
 
+.productGalleryInteractive {
+  grid-template-columns: 86px minmax(0, 1fr);
+  align-items: start;
+}
+
 .productMainImage,
 .productThumb {
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-xl);
-  background: var(--surface-muted);
+  background:
+    radial-gradient(circle at 50% 34%, rgba(255, 255, 255, 0.92), transparent 18rem),
+    var(--surface-muted);
   box-shadow: var(--shadow-soft);
+}
+
+.productMainImage {
+  position: relative;
 }
 
 .productMainImage img {
   width: 100%;
-  height: auto;
+  height: min(620px, 54vw);
   min-height: 520px;
-  object-fit: cover;
+  object-fit: contain;
+  padding: clamp(18px, 3vw, 34px);
 }
 
+.productThumbRail,
 .thumbGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 
-.productThumb {
+.productThumbRail {
+  align-content: start;
+  max-height: 620px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.productThumb,
+.productThumbButton {
   border-radius: 20px;
 }
 
-.productThumb img {
+.productThumbButton {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 4px;
+  box-shadow: var(--shadow-soft);
+}
+
+.productThumbButtonActive {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(184, 135, 70, 0.16), var(--shadow-soft);
+}
+
+.productThumb img,
+.productThumbButton img {
   width: 100%;
   aspect-ratio: 1;
-  object-fit: cover;
+  object-fit: contain;
+}
+
+.galleryArrow {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid rgba(229, 217, 199, 0.9);
+  border-radius: 50%;
+  background: rgba(255, 253, 248, 0.94);
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 950;
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-50%);
+}
+
+.galleryArrowPrev {
+  left: 14px;
+}
+
+.galleryArrowNext {
+  right: 14px;
+}
+
+.galleryCounter {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  border-radius: 999px;
+  background: rgba(23, 22, 17, 0.78);
+  color: #fff;
+  padding: 7px 11px;
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .productDetailPanel {
@@ -1613,7 +1736,8 @@ img {
 .drawerProductImage img {
   width: 82px;
   height: 82px;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 6px;
 }
 
 .drawerProductInfo {
@@ -1704,6 +1828,7 @@ img {
 }
 
 .drawerCheckoutForm input,
+.drawerCheckoutForm select,
 .drawerCheckoutForm textarea {
   width: 100%;
   border: 1px solid var(--line);
@@ -2018,12 +2143,31 @@ img {
     grid-template-columns: 1fr;
   }
 
+  .howToBuySteps {
+    grid-template-columns: 1fr;
+  }
+
   .productGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
   }
 
+  .productGalleryInteractive {
+    grid-template-columns: 1fr;
+  }
+
+  .productThumbRail {
+    order: 2;
+    grid-auto-flow: column;
+    grid-auto-columns: 72px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-height: none;
+    padding: 2px 0 4px;
+  }
+
   .productMainImage img {
+    height: 460px;
     min-height: 360px;
   }
 
@@ -2147,6 +2291,7 @@ img {
   }
 
   .productMainImage img {
+    height: 340px;
     min-height: 280px;
   }
 

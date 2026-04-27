@@ -6,6 +6,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Product } from "@/lib/types";
 import { formatPrice } from "@/lib/format";
+import { getProductMainPhoto } from "@/lib/product-photos";
 import { urlFor } from "@/lib/sanity.image";
 
 type CartDrawerProps = {
@@ -25,6 +26,8 @@ type CartOrderItem = {
 
 const CART_KEY = "brellas:cart";
 const STORE_EVENT = "brellas:store-updated";
+const deliveryMethods = ["Самовывоз", "Доставка по городу", "Транспортная компания"] as const;
+const shippingServices = ["СДЭК", "Почта России", "5Post", "Другая"] as const;
 
 function parseMinOrder(value?: string) {
   const parsed = Number.parseInt(String(value || "").replace(/[^\d]/g, ""), 10);
@@ -46,8 +49,10 @@ function saveCart(cart: Record<string, number>) {
 }
 
 function productImage(product: Product) {
-  return product.image?.asset?._ref
-    ? urlFor(product.image).width(220).height(220).fit("crop").url()
+  const mainPhoto = getProductMainPhoto(product);
+
+  return mainPhoto
+    ? urlFor(mainPhoto).width(220).height(220).fit("max").url()
     : "/placeholder-product.jpg";
 }
 
@@ -56,9 +61,16 @@ export function CartDrawer({ isOpen, products, onClose }: CartDrawerProps) {
   const [isMounted, setIsMounted] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [deliveryMethod, setDeliveryMethod] = useState("Самовывоз");
+  const [shippingService, setShippingService] = useState("СДЭК");
+  const [customShippingService, setCustomShippingService] = useState("");
+  const [address, setAddress] = useState("");
   const [comment, setComment] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const isTransport = deliveryMethod === "Транспортная компания";
+  const needsAddress = deliveryMethod !== "Самовывоз";
+  const needsCustomShipping = isTransport && shippingService === "Другая";
 
   useEffect(() => {
     setIsMounted(true);
@@ -167,6 +179,10 @@ export function CartDrawer({ isOpen, products, onClose }: CartDrawerProps) {
         source: "cart",
         name,
         phone,
+        deliveryMethod,
+        shippingService,
+        customShippingService,
+        address,
         comment,
         cartItems: orderItems,
         cartTotal: total,
@@ -186,9 +202,13 @@ export function CartDrawer({ isOpen, products, onClose }: CartDrawerProps) {
     }
 
     setStatus("success");
-    setMessage("Заявка отправлена");
+    setMessage("Заявка отправлена. Мы свяжемся с вами после обработки заказа.");
     setName("");
     setPhone("");
+    setDeliveryMethod("Самовывоз");
+    setShippingService("СДЭК");
+    setCustomShippingService("");
+    setAddress("");
     setComment("");
     saveCart({});
     setCart({});
@@ -269,6 +289,46 @@ export function CartDrawer({ isOpen, products, onClose }: CartDrawerProps) {
                   placeholder="+7..."
                 />
               </label>
+              <label>
+                <span>Способ получения *</span>
+                <select value={deliveryMethod} onChange={(event) => setDeliveryMethod(event.target.value)}>
+                  {deliveryMethods.map((method) => (
+                    <option key={method} value={method}>
+                      {method}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {isTransport ? (
+                <>
+                  <label>
+                    <span>Служба доставки *</span>
+                    <select value={shippingService} onChange={(event) => setShippingService(event.target.value)}>
+                      {shippingServices.map((service) => (
+                        <option key={service} value={service}>
+                          {service}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {needsCustomShipping ? (
+                    <label>
+                      <span>Название ТК *</span>
+                      <input
+                        value={customShippingService}
+                        onChange={(event) => setCustomShippingService(event.target.value)}
+                        required
+                      />
+                    </label>
+                  ) : null}
+                </>
+              ) : null}
+              {needsAddress ? (
+                <label>
+                  <span>Адрес / город / ПВЗ *</span>
+                  <input value={address} onChange={(event) => setAddress(event.target.value)} required />
+                </label>
+              ) : null}
               <label>
                 <span>Комментарий</span>
                 <textarea value={comment} onChange={(event) => setComment(event.target.value)} rows={2} />

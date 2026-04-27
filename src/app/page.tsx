@@ -140,6 +140,34 @@ export default async function HomePage() {
             )}
           </section>
 
+          <section className="howToBuyBlock" id="how-to-buy" aria-labelledby="how-to-buy-title">
+            <div className="sectionTitle">
+              <span className="eyebrow">Как купить</span>
+              <h2 id="how-to-buy-title">Соберите заявку на сайте</h2>
+              <p>
+                Выберите товары в каталоге, добавьте их в корзину и отправьте заявку. После отправки мы
+                свяжемся с вами, чтобы подтвердить состав заказа и способ получения.
+              </p>
+            </div>
+            <div className="howToBuySteps">
+              <article>
+                <span>1</span>
+                <strong>Выберите товары</strong>
+                <p>Откройте каталог или категорию и перейдите к нужным позициям.</p>
+              </article>
+              <article>
+                <span>2</span>
+                <strong>Добавьте в корзину</strong>
+                <p>Соберите список товаров и укажите количество для заявки.</p>
+              </article>
+              <article>
+                <span>3</span>
+                <strong>Отправьте заявку</strong>
+                <p>Оформите корзину, заполните форму или перейдите в Telegram.</p>
+              </article>
+            </div>
+          </section>
+
           <section className="marketplacesBlock" id="marketplaces">
             <div className="marketplacesIntro">
               <span className="eyebrow">Официальные магазины Brellas</span>

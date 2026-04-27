@@ -39,6 +39,7 @@ export type Product = {
   description?: PortableTextBlock[];
   category: ProductCategory | null;
   subcategory?: Subcategory | null;
+  photos?: SanityImage[];
   image?: SanityImage;
   gallery?: SanityImage[];
   featured?: boolean;

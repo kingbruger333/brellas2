@@ -34,10 +34,37 @@ export const productType = defineType({
       validation: (rule) => rule.required().min(2)
     }),
     defineField({
+      name: "photos",
+      title: "Фотографии товара",
+      description:
+        "Добавьте фотографии товара. Первое фото будет главным на сайте. Фото можно менять местами.",
+      type: "array",
+      of: [
+        {
+          type: "image",
+          options: {
+            hotspot: true
+          },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Описание фото",
+              description: "Коротко опишите, что изображено на фото.",
+              type: "string"
+            })
+          ]
+        }
+      ],
+      options: {
+        layout: "grid"
+      }
+    }),
+    defineField({
       name: "image",
       title: "Фото товара",
       description: "Добавьте качественное фото товара.",
       type: "image",
+      hidden: true,
       options: {
         hotspot: true
       },
@@ -56,6 +83,7 @@ export const productType = defineType({
       title: "Дополнительные фото товара",
       description: "Добавьте другие ракурсы, упаковку или детали товара.",
       type: "array",
+      hidden: true,
       of: [
         {
           type: "image",
@@ -186,9 +214,10 @@ export const productType = defineType({
       sku: "sku",
       category: "category.title",
       subcategory: "subcategory.title",
-      media: "image"
+      media: "photos.0",
+      legacyMedia: "image"
     },
-    prepare({ title, price, sku, category, subcategory, media }) {
+    prepare({ title, price, sku, category, subcategory, media, legacyMedia }) {
       const priceText =
         typeof price === "number" ? `${price.toLocaleString("ru-RU")} ₽` : "Цена не указана";
       const section = [category, subcategory].filter(Boolean).join(" / ");
@@ -197,7 +226,7 @@ export const productType = defineType({
       return {
         title: title || "Без названия",
         subtitle: parts.join(" • "),
-        media
+        media: media || legacyMedia
       };
     }
   }

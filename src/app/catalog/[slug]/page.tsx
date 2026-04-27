@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -8,9 +7,10 @@ import { PortableTextRenderer } from "@/components/portable-text";
 import { LeadChoiceButton } from "@/components/lead-choice-button";
 import { ProductCard } from "@/components/product-card";
 import { ProductActions } from "@/components/product-actions";
+import { ProductGallery } from "@/components/product-gallery";
 import { getCategories, getProductBySlug, getProducts, getSiteSettings } from "@/lib/content";
 import { formatPrice } from "@/lib/format";
-import { urlFor } from "@/lib/sanity.image";
+import { getProductPhotos } from "@/lib/product-photos";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -31,14 +31,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const gallery = [
-    ...(product.image ? [product.image] : []),
-    ...((product.gallery || []).filter(Boolean))
-  ];
-
-  const mainImageUrl = product.image?.asset?._ref
-    ? urlFor(product.image).width(1280).height(960).fit("crop").url()
-    : "/placeholder-product.jpg";
+  const gallery = getProductPhotos(product);
   const categoryTitle = product.category?.title;
   const categorySlug = product.category?.slug;
   const subcategoryTitle = product.subcategory?.title;
@@ -56,37 +49,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </Link>
 
           <section className="productLayout">
-            <div className="productGallery">
-              <div className="productMainImage">
-                <Image
-                  src={mainImageUrl}
-                  alt={product.image?.alt || product.title}
-                  width={1280}
-                  height={960}
-                  sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 1100px) 50vw, 42vw"
-                  priority
-                />
-              </div>
-              {gallery.length > 1 ? (
-                <div className="thumbGrid">
-                  {gallery.slice(1).map((image, index) => (
-                    <div key={`${product._id}-${index}`} className="productThumb">
-                      <Image
-                        src={
-                          image.asset?._ref
-                            ? urlFor(image).width(360).height(360).fit("crop").url()
-                            : "/placeholder-product.jpg"
-                        }
-                        alt={product.title}
-                        width={360}
-                        height={360}
-                        sizes="(max-width: 760px) 30vw, (max-width: 1100px) 16vw, 180px"
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </div>
+            <ProductGallery images={gallery} title={product.title} />
 
             <div className="productDetailPanel">
               <div className="detailTopRow">

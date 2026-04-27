@@ -198,7 +198,7 @@ export function SiteHeader({ siteTitle, categories = [], products = [] }: SiteHe
       <Container className="headerMarketMenu">
         <Link href="/catalog">Все товары</Link>
         <a href="/#popular">Популярное</a>
-        <a href="/#marketplaces">Где купить</a>
+        <a href="/#how-to-buy">Как купить</a>
         <a href="/#wholesale">Оптовые закупки</a>
         <a href="/#lead-form">Заказать подбор</a>
       </Container>
