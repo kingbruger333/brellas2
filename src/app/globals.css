@@ -2531,28 +2531,72 @@ img {
     grid-template-columns: 1fr;
   }
 
+  .catalogShell {
+    padding-bottom: 112px;
+  }
+
   .catalogSidebarDesktop {
     display: none;
   }
 
   .catalogMobileCategoriesButton {
     display: inline-flex;
-    width: fit-content;
-    min-height: 44px;
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 70;
+    min-width: min(300px, calc(100vw - 28px));
+    min-height: 58px;
     align-items: center;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: rgba(255, 253, 248, 0.9);
-    color: var(--ink);
-    padding: 0 17px;
+    gap: 11px;
+    border: 1px solid rgba(247, 217, 164, 0.36);
+    border-radius: 22px;
+    background:
+      radial-gradient(circle at 10% 0%, rgba(247, 217, 164, 0.24), transparent 7rem),
+      #171611;
+    color: #fff;
+    padding: 9px 14px 9px 10px;
     font-weight: 950;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 18px 46px rgba(23, 22, 17, 0.24);
+  }
+
+  .catalogMobileCategoriesButton span:last-child {
+    display: grid;
+    min-width: 0;
+    gap: 2px;
+    text-align: left;
+  }
+
+  .catalogMobileCategoriesButton b {
+    line-height: 1;
+  }
+
+  .catalogMobileCategoriesButton small {
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 12px;
+    font-weight: 850;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .catalogMobileCategoriesIcon {
+    display: grid;
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #f7d9a4;
+    font-size: 19px;
   }
 
   .catalogSidebarDrawer {
     position: fixed;
     inset: 0;
-    z-index: 120;
+    z-index: 1200;
     display: block;
   }
 
@@ -2560,33 +2604,48 @@ img {
     position: absolute;
     inset: 0;
     border: 0;
-    background: rgba(23, 22, 17, 0.44);
+    background: rgba(23, 22, 17, 0.5);
+    backdrop-filter: blur(6px);
   }
 
   .catalogSidebarDrawerPanel {
     position: relative;
     z-index: 1;
     display: grid;
-    width: min(86vw, 340px);
-    max-width: calc(100vw - 22px);
+    width: min(92vw, 380px);
+    max-width: calc(100vw - 16px);
     height: 100%;
-    grid-template-rows: auto minmax(0, 1fr);
-    background: var(--bg);
-    padding: 14px;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    border-right: 1px solid rgba(229, 217, 199, 0.88);
+    border-radius: 0 28px 28px 0;
+    background:
+      radial-gradient(circle at 92% 0%, rgba(184, 135, 70, 0.16), transparent 12rem),
+      linear-gradient(180deg, #fffaf0 0%, var(--bg) 100%);
+    padding: 16px;
     box-shadow: 24px 0 60px rgba(23, 22, 17, 0.22);
   }
 
   .catalogSidebarDrawerTop {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 12px;
-    padding: 4px 2px 12px;
+    padding: 4px 2px 14px;
   }
 
   .catalogSidebarDrawerTop strong {
+    display: block;
     font-size: 20px;
     letter-spacing: -0.04em;
+  }
+
+  .catalogSidebarDrawerTop span {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 850;
+    line-height: 1.35;
   }
 
   .catalogSidebarClose {
@@ -2602,9 +2661,36 @@ img {
     line-height: 1;
   }
 
+  .catalogSidebarDrawerCurrent {
+    display: grid;
+    gap: 5px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(229, 217, 199, 0.86);
+    border-radius: 18px;
+    background: rgba(255, 253, 248, 0.82);
+    padding: 12px 13px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .catalogSidebarDrawerCurrent span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .catalogSidebarDrawerCurrent strong {
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 15px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .catalogSidebarDrawerPanel .catalogSidebar {
     max-height: none;
     min-height: 0;
+    border-radius: 22px;
+    background: rgba(255, 253, 248, 0.86);
   }
 
   .howToBuySteps {

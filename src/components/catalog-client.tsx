@@ -484,7 +484,11 @@ export function CatalogClient({
           className="catalogMobileCategoriesButton"
           onClick={() => setIsCategoryDrawerOpen(true)}
         >
-          Категории
+          <span className="catalogMobileCategoriesIcon" aria-hidden="true">☰</span>
+          <span>
+            <b>Категории</b>
+            <small>{activeCategoryTitle || "Все товары"}</small>
+          </span>
         </button>
 
         <div className="catalogBody">
@@ -500,7 +504,10 @@ export function CatalogClient({
               />
               <div className="catalogSidebarDrawerPanel">
                 <div className="catalogSidebarDrawerTop">
-                  <strong>Категории</strong>
+                  <div>
+                    <strong>Каталог</strong>
+                    <span>Выберите категорию или подкатегорию</span>
+                  </div>
                   <button
                     type="button"
                     className="catalogSidebarClose"
@@ -509,6 +516,10 @@ export function CatalogClient({
                   >
                     ×
                   </button>
+                </div>
+                <div className="catalogSidebarDrawerCurrent">
+                  <span>Сейчас открыто</span>
+                  <strong>{activeSubcategoryTitle || activeCategoryTitle || "Все товары"}</strong>
                 </div>
                 {renderCategorySidebar()}
               </div>
