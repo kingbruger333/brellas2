@@ -18,7 +18,7 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
   const sectionTitle = [categoryTitle, subcategoryTitle].filter(Boolean).join(" / ");
   const mainPhoto = getProductMainPhoto(product);
   const imageUrl = mainPhoto
-    ? urlFor(mainPhoto).width(760).height(700).fit("max").url()
+    ? urlFor(mainPhoto).width(900).fit("max").url()
     : "/placeholder-product.jpg";
 
   return (
@@ -28,8 +28,8 @@ export function ProductCard({ product, telegramBotUrl }: ProductCardProps) {
           <Image
             src={imageUrl}
             alt={mainPhoto?.alt || product.title}
-            width={760}
-            height={700}
+            width={900}
+            height={900}
             sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 1020px) 50vw, 320px"
             className="productImage"
           />

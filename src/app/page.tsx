@@ -6,6 +6,7 @@ import { ProductCard } from "@/components/product-card";
 import { SectionTitle } from "@/components/section-title";
 import { LeadForm } from "@/components/lead-form";
 import { HeroSlider } from "@/components/hero-slider";
+import { CategoryCardGrid } from "@/components/category-card-grid";
 import { getCategories, getFeaturedProducts, getProducts, getSiteSettings } from "@/lib/content";
 
 export const revalidate = 60;
@@ -98,25 +99,10 @@ export default async function HomePage() {
           <section className="categoryShowcase" aria-labelledby="home-categories-title">
             <div className="sectionTitle">
               <span className="eyebrow">Категории</span>
-              <h2 id="home-categories-title">Выберите раздел</h2>
+              <h2 id="home-categories-title">Каталог по категориям</h2>
               <p>Откройте нужную категорию и быстро найдите товары для заказа.</p>
             </div>
-            <div className="categoryGrid">
-              {categories.slice(0, 8).map((category) => {
-                const count = products.filter((product) => product.category?.slug === category.slug).length;
-
-                return (
-                  <Link key={category._id} href={`/catalog/category/${category.slug}`} className="categoryTile">
-                    <span>{category.title}</span>
-                    <small>{count} товаров</small>
-                  </Link>
-                );
-              })}
-              <Link href="/catalog" className="categoryTile categoryTileDark">
-                <span>Весь каталог</span>
-                <small>{products.length} товаров</small>
-              </Link>
-            </div>
+            <CategoryCardGrid categories={categories} products={products} limit={8} />
           </section>
 
           <section className="section" id="popular">

@@ -10,9 +10,9 @@ type ProductGalleryProps = {
   title: string;
 };
 
-function imageUrl(image: SanityImage, width: number, height: number) {
+function imageUrl(image: SanityImage, width: number) {
   return image.asset?._ref
-    ? urlFor(image).width(width).height(height).fit("max").url()
+    ? urlFor(image).width(width).fit("max").url()
     : "/placeholder-product.jpg";
 }
 
@@ -27,10 +27,10 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
     <div className="productGallery">
       <div className="productMainImage">
         <Image
-          src={mainImage ? imageUrl(mainImage, 1280, 960) : "/placeholder-product.jpg"}
+          src={mainImage ? imageUrl(mainImage, 1200) : "/placeholder-product.jpg"}
           alt={mainImage?.alt || title}
-          width={1280}
-          height={960}
+          width={1200}
+          height={1200}
           sizes="(max-width: 760px) calc(100vw - 24px), (max-width: 1100px) 50vw, 42vw"
           className="productMainImageMedia"
           priority
@@ -69,7 +69,7 @@ export function ProductGallery({ images, title }: ProductGalleryProps) {
               aria-current={index === activeIndex}
             >
               <Image
-                src={imageUrl(image, 360, 360)}
+                src={imageUrl(image, 360)}
                 alt={image.alt || title}
                 width={360}
                 height={360}

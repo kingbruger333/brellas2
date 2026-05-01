@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product-card";
 import { Category, Product, Subcategory } from "@/lib/types";
@@ -234,6 +234,8 @@ export function CatalogClient({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
+  const [expandedCategorySlugs, setExpandedCategorySlugs] = useState<string[]>([]);
 
   const searchTerm = searchParams.get("q") || "";
   const sort = (searchParams.get("sort") as SortValue | null) || "manual";
@@ -311,6 +313,18 @@ export function CatalogClient({
     }, {});
   }, [products]);
 
+  const subcategoriesByCategory = useMemo(() => {
+    return subcategories.reduce<Record<string, Subcategory[]>>((acc, subcategory) => {
+      const parentSlug = subcategory.parentCategory?.slug;
+      if (!parentSlug) {
+        return acc;
+      }
+
+      acc[parentSlug] = [...(acc[parentSlug] || []), subcategory];
+      return acc;
+    }, {});
+  }, [subcategories]);
+
   const hasActiveFilters =
     searchTerm || activeCategorySlug !== "all" || activeSubcategorySlug !== "all" || sort !== "manual";
   const activeCategoryTitle =
@@ -356,6 +370,101 @@ export function CatalogClient({
 
   function resetFilters() {
     router.replace("/catalog", { scroll: false });
+    setIsCategoryDrawerOpen(false);
+  }
+
+  function toggleCategory(categorySlug: string) {
+    setExpandedCategorySlugs((current) =>
+      current.includes(categorySlug)
+        ? current.filter((slug) => slug !== categorySlug)
+        : [...current, categorySlug]
+    );
+  }
+
+  function renderCategorySidebar() {
+    return (
+      <aside className="catalogSidebar" aria-label="Категории каталога">
+        <div className="catalogSidebarHead">
+          <span>Категории</span>
+          <small>{categories.length} разделов</small>
+        </div>
+        <nav className="catalogSidebarNav">
+          <Link
+            href="/catalog"
+            className={`catalogSidebarLink ${activeCategorySlug === "all" ? "catalogSidebarLinkActive" : ""}`}
+            scroll={false}
+            onClick={() => setIsCategoryDrawerOpen(false)}
+          >
+            <span className="catalogSidebarDot" aria-hidden="true" />
+            <span className="catalogSidebarText">Все товары</span>
+            <span className="catalogSidebarCount">{products.length}</span>
+          </Link>
+
+          {categories.map((category) => {
+            const categorySubcategories = subcategoriesByCategory[category.slug] || [];
+            const isCategoryActive = activeCategorySlug === category.slug;
+            const isExpanded = isCategoryActive || expandedCategorySlugs.includes(category.slug);
+
+            return (
+              <div key={category._id} className="catalogSidebarGroup">
+                <div className={`catalogSidebarCategory ${isCategoryActive ? "catalogSidebarCategoryActive" : ""}`}>
+                  <Link
+                    href={`/catalog/category/${category.slug}`}
+                    className="catalogSidebarCategoryLink"
+                    scroll={false}
+                    onClick={() => setIsCategoryDrawerOpen(false)}
+                  >
+                    <span className="catalogSidebarDot" aria-hidden="true" />
+                    <span className="catalogSidebarText">{category.title}</span>
+                    <span className="catalogSidebarCount">{categoryCounts[category.slug] || 0}</span>
+                  </Link>
+                  {categorySubcategories.length ? (
+                    <button
+                      type="button"
+                      className="catalogSidebarToggle"
+                      aria-label={isExpanded ? "Свернуть подкатегории" : "Раскрыть подкатегории"}
+                      aria-expanded={isExpanded}
+                      onClick={() => toggleCategory(category.slug)}
+                    >
+                      <span>{isExpanded ? "−" : "+"}</span>
+                    </button>
+                  ) : null}
+                </div>
+
+                {categorySubcategories.length && isExpanded ? (
+                  <div className="catalogSidebarSublist">
+                    <Link
+                      href={`/catalog/category/${category.slug}`}
+                      className={`catalogSidebarSubLink ${
+                        isCategoryActive && activeSubcategorySlug === "all" ? "catalogSidebarSubLinkActive" : ""
+                      }`}
+                      scroll={false}
+                      onClick={() => setIsCategoryDrawerOpen(false)}
+                    >
+                      Все подкатегории
+                    </Link>
+                    {categorySubcategories.map((subcategory) => (
+                      <Link
+                        key={subcategory._id}
+                        href={`/catalog/category/${category.slug}?subcategory=${subcategory.slug}`}
+                        className={`catalogSidebarSubLink ${
+                          activeSubcategorySlug === subcategory.slug ? "catalogSidebarSubLinkActive" : ""
+                        }`}
+                        scroll={false}
+                        onClick={() => setIsCategoryDrawerOpen(false)}
+                      >
+                        <span>{subcategory.title}</span>
+                        <span>{subcategoryCounts[subcategory.slug] || 0}</span>
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </nav>
+      </aside>
+    );
   }
 
   return (
@@ -370,135 +479,128 @@ export function CatalogClient({
           </p>
         </div>
 
-        <div className="catalogControls">
-          <div className="catalogSearch">
-            <label htmlFor="catalog-search" className="catalogLabel">
-              Поиск по товарам
-            </label>
-            <input
-              id="catalog-search"
-              className="catalogInput"
-              type="search"
-              placeholder="Название, категория, описание или артикул"
-              value={searchTerm}
-              onChange={(event) => updateQuery({ q: event.target.value })}
-            />
-          </div>
+        <button
+          type="button"
+          className="catalogMobileCategoriesButton"
+          onClick={() => setIsCategoryDrawerOpen(true)}
+        >
+          Категории
+        </button>
 
-          <div className="catalogSort">
-            <label htmlFor="catalog-sort" className="catalogLabel">
-              Сортировка
-            </label>
-            <select
-              id="catalog-sort"
-              className="catalogSelect"
-              value={sort}
-              onChange={(event) => updateQuery({ sort: event.target.value as SortValue })}
-            >
-              <option value="manual">По порядку</option>
-              <option value="newest">Сначала недавно добавленные</option>
-              <option value="price-asc">Цена по возрастанию</option>
-              <option value="price-desc">Цена по убыванию</option>
-            </select>
-          </div>
+        <div className="catalogBody">
+          <div className="catalogSidebarDesktop">{renderCategorySidebar()}</div>
 
-          <div className="catalogSort">
-            <label htmlFor="catalog-subcategory" className="catalogLabel">
-              Подкатегория
-            </label>
-            <select
-              id="catalog-subcategory"
-              className="catalogSelect"
-              value={activeSubcategorySlug}
-              onChange={(event) => updateQuery({ subcategory: event.target.value })}
-            >
-              <option value="all">Все подкатегории</option>
-              {visibleSubcategories.map((subcategory) => (
-                <option key={subcategory._id} value={subcategory.slug}>
-                  {subcategory.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="categoryScroller" aria-label="Категории каталога">
-          <Link
-            href="/catalog"
-            className={`categoryChip ${activeCategorySlug === "all" ? "categoryChipActive" : ""}`}
-            scroll={false}
-          >
-            Все товары <span>{products.length}</span>
-          </Link>
-          {categories.map((category) => (
-            <Link
-              key={category._id}
-              href={`/catalog/category/${category.slug}`}
-              className={`categoryChip ${
-                activeCategorySlug === category.slug ? "categoryChipActive" : ""
-              }`}
-              scroll={false}
-            >
-              {category.title} <span>{categoryCounts[category.slug] || 0}</span>
-            </Link>
-          ))}
-        </div>
-
-        {visibleSubcategories.length ? (
-          <div className="subcategoryScroller" aria-label="Подкатегории каталога">
-            <button
-              type="button"
-              className={`categoryChip ${activeSubcategorySlug === "all" ? "categoryChipActive" : ""}`}
-              onClick={() => updateQuery({ subcategory: "all" })}
-            >
-              Все подкатегории
-            </button>
-            {visibleSubcategories.map((subcategory) => (
+          {isCategoryDrawerOpen ? (
+            <div className="catalogSidebarDrawer" role="dialog" aria-modal="true" aria-label="Категории">
               <button
-                key={subcategory._id}
                 type="button"
-                className={`categoryChip ${
-                  activeSubcategorySlug === subcategory.slug ? "categoryChipActive" : ""
-                }`}
-                onClick={() => updateQuery({ subcategory: subcategory.slug })}
-              >
-                {subcategory.title} <span>{subcategoryCounts[subcategory.slug] || 0}</span>
-              </button>
-            ))}
-          </div>
-        ) : null}
-
-        {hasActiveFilters ? (
-          <div className="activeFilters">
-            <span>Активная подборка:</span>
-            {activeCategoryTitle ? <span className="filterChip">{activeCategoryTitle}</span> : null}
-            {activeSubcategoryTitle ? <span className="filterChip">{activeSubcategoryTitle}</span> : null}
-            {searchTerm ? <span className="filterChip">Поиск: {searchTerm}</span> : null}
-            {sort !== "manual" ? <span className="filterChip">Сортировка включена</span> : null}
-            <button type="button" className="resetFiltersButton" onClick={resetFilters}>
-              Сбросить фильтры
-            </button>
-          </div>
-        ) : null}
-
-        {filteredProducts.length ? (
-          <div className="productGrid">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                telegramBotUrl={telegramBotUrl}
+                className="catalogSidebarBackdrop"
+                aria-label="Закрыть категории"
+                onClick={() => setIsCategoryDrawerOpen(false)}
               />
-            ))}
+              <div className="catalogSidebarDrawerPanel">
+                <div className="catalogSidebarDrawerTop">
+                  <strong>Категории</strong>
+                  <button
+                    type="button"
+                    className="catalogSidebarClose"
+                    aria-label="Закрыть категории"
+                    onClick={() => setIsCategoryDrawerOpen(false)}
+                  >
+                    ×
+                  </button>
+                </div>
+                {renderCategorySidebar()}
+              </div>
+            </div>
+          ) : null}
+
+          <div className="catalogContent">
+            <div className="catalogControls">
+              <div className="catalogSearch">
+                <label htmlFor="catalog-search" className="catalogLabel">
+                  Поиск по товарам
+                </label>
+                <input
+                  id="catalog-search"
+                  className="catalogInput"
+                  type="search"
+                  placeholder="Название, категория, описание или артикул"
+                  value={searchTerm}
+                  onChange={(event) => updateQuery({ q: event.target.value })}
+                />
+              </div>
+
+              <div className="catalogSort">
+                <label htmlFor="catalog-sort" className="catalogLabel">
+                  Сортировка
+                </label>
+                <select
+                  id="catalog-sort"
+                  className="catalogSelect"
+                  value={sort}
+                  onChange={(event) => updateQuery({ sort: event.target.value as SortValue })}
+                >
+                  <option value="manual">По порядку</option>
+                  <option value="newest">Сначала недавно добавленные</option>
+                  <option value="price-asc">Цена по возрастанию</option>
+                  <option value="price-desc">Цена по убыванию</option>
+                </select>
+              </div>
+
+              <div className="catalogSort">
+                <label htmlFor="catalog-subcategory" className="catalogLabel">
+                  Подкатегория
+                </label>
+                <select
+                  id="catalog-subcategory"
+                  className="catalogSelect"
+                  value={activeSubcategorySlug}
+                  onChange={(event) => updateQuery({ subcategory: event.target.value })}
+                >
+                  <option value="all">Все подкатегории</option>
+                  {visibleSubcategories.map((subcategory) => (
+                    <option key={subcategory._id} value={subcategory.slug}>
+                      {subcategory.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {hasActiveFilters ? (
+              <div className="activeFilters">
+                <span>Активная подборка:</span>
+                {activeCategoryTitle ? <span className="filterChip">{activeCategoryTitle}</span> : null}
+                {activeSubcategoryTitle ? <span className="filterChip">{activeSubcategoryTitle}</span> : null}
+                {searchTerm ? <span className="filterChip">Поиск: {searchTerm}</span> : null}
+                {sort !== "manual" ? <span className="filterChip">Сортировка включена</span> : null}
+                <button type="button" className="resetFiltersButton" onClick={resetFilters}>
+                  Сбросить фильтры
+                </button>
+              </div>
+            ) : null}
+
+            {filteredProducts.length ? (
+              <div className="productGrid">
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    product={product}
+                    telegramBotUrl={telegramBotUrl}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="emptyState">
+                <h2>Ничего не найдено. Попробуйте изменить запрос.</h2>
+                <button type="button" className="primaryButton" onClick={resetFilters}>
+                  Сбросить фильтры
+                </button>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="emptyState">
-            <h2>Ничего не найдено. Попробуйте изменить запрос.</h2>
-            <button type="button" className="primaryButton" onClick={resetFilters}>
-              Сбросить фильтры
-            </button>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );

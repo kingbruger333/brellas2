@@ -10,6 +10,7 @@ export type Category = {
   title: string;
   slug: string;
   description?: string;
+  photo?: SanityImage;
   sortOrder: number;
   productCount?: number;
 };

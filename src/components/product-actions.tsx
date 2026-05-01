@@ -41,6 +41,7 @@ function emitStoreUpdate() {
 export function ProductActions({ productId, minOrder }: ProductActionsProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [inCart, setInCart] = useState(false);
+  const [notice, setNotice] = useState("");
   const minimum = parseMinOrder(minOrder);
 
   useEffect(() => {
@@ -58,6 +59,15 @@ export function ProductActions({ productId, minOrder }: ProductActionsProps) {
     };
   }, [productId]);
 
+  useEffect(() => {
+    if (!notice) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => setNotice(""), 1600);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
   function toggleFavorite() {
     const favorites = readArray(FAVORITES_KEY);
     const next = favorites.includes(productId)
@@ -66,6 +76,7 @@ export function ProductActions({ productId, minOrder }: ProductActionsProps) {
 
     window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(next));
     setIsFavorite(next.includes(productId));
+    setNotice(next.includes(productId) ? "Добавлено в избранное" : "Убрано из избранного");
     emitStoreUpdate();
   }
 
@@ -74,6 +85,7 @@ export function ProductActions({ productId, minOrder }: ProductActionsProps) {
     cart[productId] = cart[productId] ? cart[productId] + 1 : minimum;
     window.localStorage.setItem(CART_KEY, JSON.stringify(cart));
     setInCart(true);
+    setNotice("Товар добавлен в корзину");
     emitStoreUpdate();
   }
 
@@ -90,6 +102,9 @@ export function ProductActions({ productId, minOrder }: ProductActionsProps) {
       <button type="button" className="cartMiniButton" onClick={addToCart}>
         {inCart ? "В корзине" : "В корзину"}
       </button>
+      <span className={`productActionNotice ${notice ? "productActionNoticeVisible" : ""}`} aria-live="polite">
+        {notice}
+      </span>
     </div>
   );
 }

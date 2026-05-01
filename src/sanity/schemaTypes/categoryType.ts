@@ -27,6 +27,15 @@ export const categoryType = defineType({
       rows: 3
     }),
     defineField({
+      name: "photo",
+      title: "Фото категории",
+      description: "Добавьте фото для карточки категории на сайте",
+      type: "image",
+      options: {
+        hotspot: true
+      }
+    }),
+    defineField({
       name: "slug",
       title: "Ссылка категории",
       description: "Создается из названия. Нужна для ссылки на категорию.",
@@ -49,15 +58,14 @@ export const categoryType = defineType({
   preview: {
     select: {
       title: "title",
-      description: "description",
-      sortOrder: "sortOrder"
+      slug: "slug.current",
+      media: "photo"
     },
-    prepare({ title, description, sortOrder }) {
-      const order = typeof sortOrder === "number" ? `Порядок: ${sortOrder}` : "Порядок не указан";
-
+    prepare({ title, slug, media }) {
       return {
         title: title || "Без названия",
-        subtitle: description ? `${description} • ${order}` : order
+        subtitle: slug ? `/${slug}` : "Ссылка не указана",
+        media
       };
     }
   }

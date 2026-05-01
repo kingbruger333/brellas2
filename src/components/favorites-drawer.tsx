@@ -50,7 +50,7 @@ function productImage(product: Product) {
   const mainPhoto = getProductMainPhoto(product);
 
   return mainPhoto
-    ? urlFor(mainPhoto).width(220).height(220).fit("max").url()
+    ? urlFor(mainPhoto).width(220).fit("max").url()
     : "/placeholder-product.jpg";
 }
 

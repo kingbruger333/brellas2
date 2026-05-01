@@ -56,6 +56,7 @@ export const categoriesQuery = groq`
     title,
     "slug": slug.current,
     description,
+    photo,
     sortOrder
   }
 `;
@@ -66,6 +67,7 @@ export const categoryBySlugQuery = groq`
     title,
     "slug": slug.current,
     description,
+    photo,
     sortOrder
   }
 `;
