@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { LeadChoiceButton } from "@/components/lead-choice-button";
 
 const LEAD_PREFILL_STORAGE_KEY = "brellas:lead-prefill";
+const MAX_URL = "https://max.ru/u/f9LHodD0cOLx5I9Piq5WiNKdBwiT4Vi7KPs14g1kcC1SpPlxP4HH0QCb03w";
 
 type LeadFormProps = {
   telegramUrl: string;
@@ -104,6 +105,10 @@ export function LeadForm({ telegramUrl }: LeadFormProps) {
               Telegram
             </a>
           ) : null}
+          <a href={MAX_URL} className="secondaryButton messengerButton" target="_blank" rel="noreferrer">
+            <span className="maxMessengerIcon" aria-hidden="true" />
+            MAX
+          </a>
           <a href="tel:+79772554989" className="secondaryButton">
             Позвонить
           </a>

@@ -689,6 +689,44 @@ img {
   border-color: var(--accent);
 }
 
+.messengerButton,
+.footerMessengerLink {
+  gap: 8px;
+}
+
+.maxMessengerIcon {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #22b8ff 0%, #2368ff 54%, #7546ff 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.24), 0 8px 18px rgba(35, 104, 255, 0.22);
+}
+
+.maxMessengerIcon::before {
+  position: absolute;
+  top: 7px;
+  left: 6px;
+  width: 14px;
+  height: 10px;
+  border-radius: 999px;
+  background: #fff;
+  content: "";
+}
+
+.maxMessengerIcon::after {
+  position: absolute;
+  left: 9px;
+  bottom: 7px;
+  width: 7px;
+  height: 7px;
+  background: #fff;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  content: "";
+}
+
 .heroSliderControls {
   position: absolute;
   z-index: 4;
@@ -2443,7 +2481,9 @@ img {
   .mobileMenuPanel .primaryButton {
     justify-content: center;
     border: 0;
+    background: linear-gradient(135deg, #c79a58, #8d5f2b);
     color: #fff;
+    box-shadow: 0 14px 30px rgba(141, 95, 43, 0.22);
   }
 
   .catalogDropdownInner {

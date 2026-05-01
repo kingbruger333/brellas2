@@ -21,6 +21,7 @@ type LeadChoiceContextValue = {
 
 const LEAD_PREFILL_STORAGE_KEY = "brellas:lead-prefill";
 const CONTACT_PHONE_HREF = "tel:+79772554989";
+const MAX_URL = "https://max.ru/u/f9LHodD0cOLx5I9Piq5WiNKdBwiT4Vi7KPs14g1kcC1SpPlxP4HH0QCb03w";
 
 const LeadChoiceContext = createContext<LeadChoiceContextValue | null>(null);
 
@@ -102,6 +103,10 @@ function LeadChoiceModal({ isOpen, request, onClose, onChooseForm }: LeadChoiceM
             onClick={onClose}
           >
             Написать в Telegram
+          </a>
+          <a href={MAX_URL} className="secondaryButton messengerButton" target="_blank" rel="noreferrer" onClick={onClose}>
+            <span className="maxMessengerIcon" aria-hidden="true" />
+            Написать в MAX
           </a>
           <a href={CONTACT_PHONE_HREF} className="secondaryButton" onClick={onClose}>
             Позвонить
